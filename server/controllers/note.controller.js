@@ -51,7 +51,7 @@ export const deleteNote = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, {}, "Note deleted"));
 });
 
-
+//Upload PDF Note
 export const uploadPdfNote = asyncHandler(async (req, res) => {
   if (!req.file) {
     throw new ApiError(400, "No PDF file uploaded");
@@ -59,11 +59,7 @@ export const uploadPdfNote = asyncHandler(async (req, res) => {
 
   const pdfBuffer = req.file.buffer; // ✅ use buffer directly
   const pdfData = await pdfParse(pdfBuffer);
-console.log("Extracted Text:", pdfData.text.slice(0, 500)); // Preview first 500 chars
-
-
   const { subject, tags = [] } = req.body;
-
   const note = await Note.create({
     title: req.file.originalname,
     content: pdfData.text,
