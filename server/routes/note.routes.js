@@ -1,5 +1,5 @@
 import {Router} from "express";
-import { createNote, getAllNotes, updateNote, deleteNote, uploadPdfNote, generateQuizFromNote } from "../controllers/note.controller.js";
+import { createNote, getAllNotes, updateNote, deleteNote, uploadPdfNote, generateQuizFromNote, submitQuiz,getUserQuizResults } from "../controllers/note.controller.js";
 import { isAuthenticated } from "../middlewares/isAuthenticated.js";
  import { upload } from "../middlewares/upload.js";
 const router = Router();
@@ -17,5 +17,7 @@ router.route("/:id")
 router.route("/upload-pdf").post(upload.single("pdf"), uploadPdfNote)
 
 router.route("/:id/genrate-quiz").post(generateQuizFromNote)
+router.route("/:id/submit-quiz").post(submitQuiz)
+router.route("/quiz-results").get(getUserQuizResults)
 export default router;
   
