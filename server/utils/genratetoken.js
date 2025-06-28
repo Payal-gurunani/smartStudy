@@ -7,7 +7,6 @@ export const generateToken = (user) =>{
   process.env.JWT_SECRET,
   { expiresIn: "7d" }
 );
-    // console.log(t,"From genrate");
     return t;
     
     

@@ -14,7 +14,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/users',userRoutes)
 app.use('/api/v1/notes', noteRoutes);
 
-// Error handler (for async errors too)
+
 app.use((err, req, res, next) => {
   console.error("🔥 Error:", err);
 

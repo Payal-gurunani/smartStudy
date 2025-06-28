@@ -12,20 +12,19 @@ const noteSchema = new mongoose.Schema({
     content:{ 
             type: String,
         }, 
-        // for text or extracted PDF
-  
+        
     tags:
-        [String], // ['Physics', 'Class 12']
+        [String], 
     subject:
         { 
             type: String 
-        }, // "Biology", "History", etc.
+        }, 
     isPdf: {
       type: Boolean,
       default: false,
     },
     pdfPath: {
-      type: String, // path or URL to the uploaded PDF
+      type: String, 
     },
 }, { timestamps: true });
 
