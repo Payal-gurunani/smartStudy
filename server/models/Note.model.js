@@ -26,6 +26,18 @@ const noteSchema = new mongoose.Schema({
     pdfPath: {
       type: String, 
     },
+      quiz: [
+    {
+      question: String,
+      options: {
+        A: String,
+        B: String,
+        C: String,
+        D: String
+      },
+      answer: String 
+    }
+  ]
 }, { timestamps: true });
 
 export const Note = mongoose.model("Note", noteSchema);

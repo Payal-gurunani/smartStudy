@@ -12,7 +12,7 @@ const quizResultSchema = new mongoose.Schema({
       isCorrect: Boolean,
     }
   ],
-  score: Number, // out of 100
+  score: Number, 
   attemptedAt: { type: Date, default: Date.now },
 });
 

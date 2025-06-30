@@ -4,8 +4,6 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { generateQuizFromNote,getUserQuizResults,submitQuiz } from "./quizGenrator.controller.js";
 import { uploadPdfNote } from "./uploadpdf.controller.js";
-
-
 // CREATE
 export const createNote = asyncHandler(async (req, res) => {
   const { title, content, tags, subject } = req.body;

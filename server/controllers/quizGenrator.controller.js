@@ -22,8 +22,10 @@ export const generateQuizFromNote = asyncHandler(async (req, res) => {
   if (!note || !note.content) {
     throw new ApiError(404, "Note not found or no content available");
   }
+  const numberOfQuestions = parseInt(req.query.count) || 5;
+
 const prompt = `
-You are a quiz generator. Generate 5 multiple-choice questions from the following content.
+You are a quiz generator. Generate ${numberOfQuestions} multiple-choice questions from the following content.
 
 Each question must have 4 options labeled "A", "B", "C", and "D".
 
@@ -61,6 +63,10 @@ ${note.content}
   }
   throw new ApiError(500, "Quiz generation failed");
 }
+
+note.quiz = quiz;
+await note.save();
+
   res.status(200).json(new ApiResponse(200, quiz, "Quiz generated successfully"));
 });
 
@@ -71,46 +77,30 @@ export const submitQuiz = asyncHandler(async (req, res) => {
   const note = await Note.findOne({ _id: noteId, user: req.user._id });
   if (!note) throw new ApiError(404, "Note not found");
 
-  const prompt = `
-Generate 5 MCQ quiz questions from the content below in this JSON format:
-[
-  {
-    "question": "...",
-    "options": ["A", "B", "C", "D"],
-    "answer": "B"
+  const quiz = note.quiz;
+  if (!quiz || quiz.length === 0) {
+    throw new ApiError(400, "Quiz not found. Please generate it first.");
   }
-]
-CONTENT:
-${note.content}
-`;
 
-  const completion = await openai.chat.completions.create({
-   model: "mistralai/mistral-7b-instruct",
+  let correct = 0;
+  const evaluated = quiz.map((q, i) => {
+    const selected = answers[i]?.selectedAnswer; // "A", "B", etc.
+    const isCorrect = selected === q.answer;
 
-    messages: [{ role: "user", content: prompt }],
-    temperature: 0.7,
+    if (isCorrect) correct++;
+
+    return {
+      question: q.question,
+      options: q.options,
+      correctAnswer: q.answer,
+      selectedAnswer: selected,
+      isCorrect,
+    };
   });
 
-  const quiz = JSON.parse(completion.choices[0].message.content);
-  let correct = 0;
-const evaluated = quiz.map((q, i) => {
-  const selected = answers[i]?.selectedAnswer; // "A", "B", etc.
-  const isCorrect = selected === q.answer;
-
-  if (isCorrect) correct++;
-
-  return {
-    question: q.question,
-    options: q.options, // Object with A-D
-    correctAnswer: q.answer,
-    selectedAnswer: selected,
-    isCorrect,
-  };
-});
-if (evaluated.length !== quiz.length) {
+  if (evaluated.length !== quiz.length) {
     throw new ApiError(400, "Invalid number of answers provided");
   }
-
 
   const score = Math.round((correct / quiz.length) * 100);
 
@@ -124,8 +114,15 @@ if (evaluated.length !== quiz.length) {
   res.status(200).json(new ApiResponse(200, result, "Quiz submitted and evaluated"));
 });
 
-
 export const getUserQuizResults = asyncHandler(async (req, res) => {
-  const results = await QuizResult.find({ user: req.user._id }).sort({ attemptedAt: -1 });
-  res.status(200).json(new ApiResponse(200, results, "Quiz results fetched"));
+  const results = await QuizResult.find({ user: req.user._id })
+    .populate('noteId', 'title') // populate only title from Note
+    .sort({ attemptedAt: -1 });
+
+  const simplifiedResults = results.map(result => ({
+    title: result.noteId?.title || "Untitled",
+    score: result.score
+  }));
+
+  res.status(200).json(new ApiResponse(200, simplifiedResults, "Quiz results fetched"));
 });
