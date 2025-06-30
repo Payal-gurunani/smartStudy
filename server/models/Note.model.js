@@ -37,7 +37,19 @@ const noteSchema = new mongoose.Schema({
       },
       answer: String 
     }
-  ]
+  ],
+  flashcards: [
+  {
+    question: String,
+    answer: String,
+  }
+],
+summary: {
+  type: String,
+  default: "",
+}
+
+
 }, { timestamps: true });
 
 export const Note = mongoose.model("Note", noteSchema);

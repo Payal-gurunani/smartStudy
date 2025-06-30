@@ -3,6 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { ApiError } from "../utils/ApiError.js";
 import { generateQuizFromNote,getUserQuizResults,submitQuiz } from "./quizGenrator.controller.js";
+import { generateFlashcardsFromNote,summarizeNote } from "./flashcard.controller.js";
 import { uploadPdfNote } from "./uploadpdf.controller.js";
 // CREATE
 export const createNote = asyncHandler(async (req, res) => {
@@ -54,5 +55,8 @@ export{uploadPdfNote,
   //Quiz Generation and results
   generateQuizFromNote,
   submitQuiz,
-  getUserQuizResults
+  getUserQuizResults,
+  //flahcards and summarization
+  generateFlashcardsFromNote,
+  summarizeNote
 }
