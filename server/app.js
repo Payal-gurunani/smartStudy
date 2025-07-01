@@ -4,6 +4,7 @@ import userRoutes from './routes/user.routes.js';
 import noteRoutes from './routes/note.routes.js';
 import flashcardRoutes from './routes/flashcard.routes.js';
 import studyScheduleRoutes from './routes/studySchedule.routes.js';
+import progressRoutes from './routes/progress.routes.js';
 const app = express();
 
 app.use(express.json());
@@ -17,6 +18,7 @@ app.use('/api/v1/users',userRoutes)
 app.use('/api/v1/notes', noteRoutes);
 app.use('/api/v1/study-schedule', studyScheduleRoutes);
 app.use('/api/v1/flashcards',flashcardRoutes)
+app.use('/api/v1/progress',progressRoutes)
 app.use((err, req, res, next) => {
   console.error("🔥 Error:", err);
 
