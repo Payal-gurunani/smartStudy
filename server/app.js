@@ -5,8 +5,14 @@ import noteRoutes from './routes/note.routes.js';
 import flashcardRoutes from './routes/flashcard.routes.js';
 import studyScheduleRoutes from './routes/studySchedule.routes.js';
 import progressRoutes from './routes/progress.routes.js';
+import cors from 'cors';
 const app = express();
-
+app.use(
+  cors({
+    origin: 'http://localhost:3005', 
+    credentials: true,  
+  })
+)
 app.use(express.json());
 app.use(cookieParser());
 
