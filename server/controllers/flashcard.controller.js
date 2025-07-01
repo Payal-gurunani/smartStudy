@@ -3,7 +3,7 @@ import { ApiError } from "../utils/ApiError.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import OpenAI from "openai";
-
+import { Flashcard } from "../models/flashcard.model.js";
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
   baseURL: "https://openrouter.ai/api/v1",
@@ -50,12 +50,65 @@ ${note.content}
   } catch (error) {
     throw new ApiError(500, "Failed to parse flashcard JSON. Try again.");
   }
+let tags = [];
 
-  note.flashcards = flashcards;
-  await note.save();
+try {
+  if (Array.isArray(note.tags)) {
+    // Handles cases like: ['["Optics", "Light"]']
+    if (
+      note.tags.length === 1 &&
+      typeof note.tags[0] === "string" &&
+      note.tags[0].trim().startsWith("[") &&
+      note.tags[0].trim().endsWith("]")
+    ) {
+      const parsed = JSON.parse(note.tags[0]);
+      tags = Array.isArray(parsed) ? parsed : [];
+    } else {
+      tags = note.tags;
+    }
+  } else if (typeof note.tags === "string") {
+    const parsed = JSON.parse(note.tags);
+    tags = Array.isArray(parsed) ? parsed : [];
+  }
+} catch (err) {
+  tags = [];
+}
+
+
+
+
+const flashcardsToSave = flashcards.map(f => ({
+  user: req.user._id,
+  noteId: note._id,
+  question: f.question,
+  answer: f.answer,
+  subject: note.subject,
+  tags: tags 
+}));
+
+await Flashcard.insertMany(flashcardsToSave);
+
+
+await Flashcard.insertMany(flashcardsToSave);
+
 
   res.status(200).json(new ApiResponse(200, flashcards, "Flashcards generated successfully"));
 });
+
+
+export const searchFlashcards = asyncHandler(async (req, res) => {
+  const { query, subject, tag } = req.query;
+
+  const filter = { user: req.user._id };
+  if (subject) filter.subject = subject;
+  if (tag) filter.tags = tag;
+  if (query) filter.$text = { $search: query };
+
+  const flashcards = await Flashcard.find(filter).sort({ updatedAt: -1 });
+
+  res.status(200).json(new ApiResponse(200, flashcards, "Flashcards fetched"));
+});
+
 
 export const summarizeNote = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -86,3 +139,4 @@ ${note.content}
 
   res.status(200).json(new ApiResponse(200, summary, "Summary generated successfully"));
 });
+
