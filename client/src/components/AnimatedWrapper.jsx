@@ -1,4 +1,3 @@
-// src/components/AnimatedWrapper.jsx
 import { motion } from "framer-motion";
 
 const animationVariants = {
@@ -13,7 +12,7 @@ const animationVariants = {
       staggerChildren: 0.15,
     },
   },
-  exit: { opacity: 0, y: -20, transition: { duration: 0.3, ease: "easeIn" } }, // ✅ properly define `exit`
+  exit: { opacity: 0, y: -20, transition: { duration: 0.3, ease: "easeIn" } }, 
 };
 
 export default function AnimatedWrapper({ children }) {

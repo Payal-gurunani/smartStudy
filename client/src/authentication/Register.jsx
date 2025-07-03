@@ -1,11 +1,13 @@
-// src/pages/Register.jsx
-import { useState } from "react";
+import { useState ,useEffect} from "react";
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
+import { useAuth } from "../context/Authcontext";
 import { FaUser, FaEnvelope, FaLock, FaGoogle, FaGithub, FaTwitter } from "react-icons/fa";
-import { registerUser } from "../api/auth";
 import { useNavigate } from "react-router-dom";
+import { apiRequest } from "../api/apiRequest";
+import { endpoints } from "../api/endPoints";
 export default function Register() {
+  const { isAuthenticated } = useAuth(); 
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -24,15 +26,23 @@ export default function Register() {
   const handleSubmit =async (e) => {
     e.preventDefault();
    try {
-     const res = await registerUser(formData)
+     const res = await apiRequest({
+      method: endpoints.register.method,
+      url: endpoints.register.url,
+      data: formData,
+     })
      navigate("/");
     console.log("Form Data:", res);
    } catch (error) {
     console.error("Registration error:", error.response?.data || error.message);
-    
    }
-    // TODO: Connect with backend
+  
   };
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home", { replace: true }); 
+    }
+  }, [isAuthenticated]);
 
   return (
     <div className="min-h-screen bg-slate-900 flex items-center justify-center px-4">

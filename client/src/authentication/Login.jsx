@@ -1,9 +1,11 @@
-// src/pages/Login.jsx
-import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { loginUser } from "../api/auth";
-
+import { useAuth } from "../context/Authcontext";
+import { setAuthToken } from "../api/axiosInstance"; 
+import { apiRequest } from "../api/apiRequest";
+import { endpoints } from "../api/endPoints";
+import { toast } from "react-toastify";
 
 const containerVariants = {
   hidden: { opacity: 0, y: 40 },
@@ -29,6 +31,12 @@ export default function Login() {
     password: "",
   });
 
+  const { user, setUser } = useAuth(); 
+  const { isAuthenticated } = useAuth(); 
+  const { setIsAuthenticated } = useAuth();  
+  const navigate = useNavigate();
+const [loginError, setLoginError] = useState("");
+
   const handleChange = (e) => {
     setFormData((prev) => ({
       ...prev,
@@ -37,16 +45,35 @@ export default function Login() {
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      const res = await loginUser(formData);
-      console.log("Login successful:", res);
-      
-    } catch (error) {
-      console.error("Login error:", error.response?.data || error.message);
-     
+  e.preventDefault();
+  setLoginError(""); 
+
+  try {
+    const res = await apiRequest({
+      method: endpoints.login.method,
+      url: endpoints.login.url,
+      data: formData,
+    });
+
+    localStorage.setItem("token", res.token);
+    setAuthToken(res.token);
+    setUser(res.user || res.data.user);
+    setIsAuthenticated(true);
+    toast.success("Login successful! Welcome back!");
+    navigate("/home");
+  } catch (error) {
+    const backendMessage =
+      error.message || "Login failed. Please try again.";
+
+    setLoginError(backendMessage);
+    console.error("Login error:", backendMessage);
+  }
+};
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/home", { replace: true }); 
     }
-  };
+  }, [isAuthenticated]);
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
@@ -62,6 +89,14 @@ export default function Login() {
         >
           Sign in to Smart Study
         </motion.h1>
+        {loginError && (
+  <motion.div
+    variants={childVariants}
+    className="text-red-400 text-sm text-center mt-2"
+  >
+    {loginError}
+  </motion.div>
+)}
 
         <form onSubmit={handleSubmit} className="space-y-5">
           <motion.div variants={childVariants}>

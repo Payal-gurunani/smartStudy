@@ -70,6 +70,7 @@ const passwordMatch = await user.matchPassword(password);
    .cookie("token", token, tokenOptions)
   .json(
     new ApiResponse(200,{
+        token,
         user:userLogin,
     },"Successfully login")
   )
@@ -85,6 +86,19 @@ res.clearCookie("token", {
 return res.status(200).json(new ApiResponse(200, {}, "Logged out"));
 });
 
+// controllers/userController.js
+const checkLogin = asyncHandler(async (req, res) => {
+  if (!req.user) {
+    return res.status(401).json({ success: false, message: "Not authenticated" });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "Authenticated",
+    data: { user: req.user }, // or just a minimal set like name/email
+  });
+});
+
 
 const getProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");
@@ -97,4 +111,4 @@ const getProfile = asyncHandler(async (req, res) => {
   );
 });
 
-export {Register,loginUser,logoutUser,getProfile}
+export {Register,loginUser,logoutUser,getProfile,checkLogin}

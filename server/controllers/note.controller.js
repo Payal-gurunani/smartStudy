@@ -24,6 +24,25 @@ export const getAllNotes = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, notes, "Notes fetched"));
 });
 
+// GET /notes/:id
+export const getSingleNote = async (req, res) => {
+  try {
+    const note = await Note.findById(req.params.id);
+
+    if (!note) {
+      return res.status(404).json({ message: "Note not found" });
+    }
+
+    res.status(200).json(
+      new ApiResponse(200, note, "Note fetched successfully")
+    );
+  } catch (err) {
+    console.error("Error fetching note:", err);
+    res.status(500).json({ message: "Server error" });
+  }
+};
+
+
 // UPDATE
 export const updateNote = asyncHandler(async (req, res) => {
   const { id } = req.params;
@@ -46,17 +65,13 @@ export const deleteNote = asyncHandler(async (req, res) => {
 
   const deleted = await Note.findOneAndDelete({ _id: id, user: req.user._id });
   if (!deleted) throw new ApiError(404, "Note not found or unauthorized");
-
-  res.status(200).json(new ApiResponse(200, {}, "Note deleted"));
+  res.status(200).json(new ApiResponse(200, "Note deleted"));
 });
 
 //Upload PDF Note
 export{uploadPdfNote,
-  //Quiz Generation and results
   generateQuizFromNote,
   submitQuiz,
   getUserQuizResults,
-  //flahcards and summarization
-  
   summarizeNote
 }

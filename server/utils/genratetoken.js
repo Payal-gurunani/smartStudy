@@ -8,6 +8,4 @@ export const generateToken = (user) =>{
   { expiresIn: "2h" }
 );
     return t;
-    
-    
 }
