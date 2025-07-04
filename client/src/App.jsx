@@ -15,12 +15,17 @@ import UploadPdfNote from "./pages/notes/UploadPdfNote.jsx";
 import Home from "./components/Home.jsx";
 import Profile from "./pages/Profile.jsx";
 import NoteDetail from "./pages/notes/NoteDetail.jsx";
+import GenerateQuizPage from "./pages/quizes/GenrateQuiz.jsx";
+import QuizResultsPage from "./pages/quizes/QuizResults.jsx";
+import QuizAttemptPage from "./pages/quizes/QuizAttempt.jsx";
+import QuizSingleResultPage from "./pages/quizes/QuizSingleResultPage.jsx";
+import Quizzess from "./pages/quizes/Quizzess.jsx";
 function App() {
   const location = useLocation();
 
   return (
     <AnimatePresence >
-       <ToastContainer position="top-right" autoClose={3000} />
+      <ToastContainer position="top-right" autoClose={3000} />
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Layout />}>
           <Route path="/home" element={<Home />} />
@@ -37,22 +42,22 @@ function App() {
           />
 
           <Route
-          path="profile"
-          element={
-            <ProtectedRoute>
-              <Profile />
-            </ProtectedRoute>
-          }
+            path="profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
           />
           <Route
-          path="/notes/:id"
-          element={
-            <ProtectedRoute>
-              <NoteDetail />
-            </ProtectedRoute>
-          }
+            path="/notes/:id"
+            element={
+              <ProtectedRoute>
+                <NoteDetail />
+              </ProtectedRoute>
+            }
           />
-          
+
           <Route
             path="notes"
             element={
@@ -85,6 +90,7 @@ function App() {
               </ProtectedRoute>
             }
           />
+
           <Route
             path="notes/upload"
             element={
@@ -93,6 +99,61 @@ function App() {
               </ProtectedRoute>
             }
           />
+
+          <Route
+            path="/notes/:noteId/quiz/generate"
+            element={
+              <ProtectedRoute>
+                <GenerateQuizPage />
+              </ProtectedRoute>
+            }
+          />
+          <Route path="/quizzes/:noteId/attempt" element={
+            <ProtectedRoute>
+              <QuizAttemptPage />
+            </ProtectedRoute>
+          }
+          />
+
+
+          <Route path="/quizzes/results" element=
+            {
+              <ProtectedRoute>
+                <QuizResultsPage />
+              </ProtectedRoute>
+
+            }
+          />
+
+        <Route
+  path="/quizzes/by-note/:noteId"
+  element={
+    <ProtectedRoute>
+      <QuizAttemptPage />
+    </ProtectedRoute>
+  }
+/>
+
+
+          <Route
+            path="/quizzes/result/:id"
+            element={
+              <ProtectedRoute>
+                <QuizSingleResultPage />
+              </ProtectedRoute>
+            }
+          />
+
+
+          <Route
+            path="/quizzes"
+            element={
+              <ProtectedRoute>
+                <Quizzess />
+              </ProtectedRoute>
+            }
+          />
+
         </Route>
       </Routes>
     </AnimatePresence>

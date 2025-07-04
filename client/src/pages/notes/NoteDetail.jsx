@@ -3,17 +3,22 @@ import { useEffect, useState } from "react";
 import { apiRequest } from "../../api/apiRequest";
 import { endpoints } from "../../api/endPoints";
 import { toast } from "react-toastify";
+import { useLocation } from "react-router-dom";
 
 export default function NoteDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
   const [note, setNote] = useState(null);
-
+  const [summary, setSummary] = useState("");
+  const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
+const location = useLocation();
   const fetchNote = async () => {
     try {
       const { method, url } = endpoints.getNote(id);
       const res = await apiRequest({ method, url });
-      setNote(res?.note || res?.data || res);
+      const noteData = res?.note || res?.data || res;
+      setNote(noteData);
+      if (noteData.summary) setSummary(noteData.summary);
     } catch (err) {
       console.error("Failed to load note", err);
       toast.error("Unable to load note");
@@ -21,17 +26,30 @@ export default function NoteDetail() {
   };
 
   const handleSummarize = async () => {
+    const toastId = toast.loading("Generating summary...");
     try {
       const { method, url } = endpoints.summarizeNote(id);
       const res = await apiRequest({ method, url });
-      const summary = typeof res === "string" ? res : res?.summary || res?.data?.summary;
+      const newSummary =
+        typeof res === "string" ? res : res?.summary || res?.data?.summary;
 
-      if (!summary) throw new Error("No summary returned");
+      if (!newSummary) throw new Error("No summary returned");
 
-      toast.info("📌 Summary: " + summary, { autoClose: 8000 });
+      setSummary(newSummary);
+      toast.update(toastId, {
+        render: "✅ Summary generated!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
     } catch (error) {
       console.error("Summarize failed", error);
-      toast.error("Failed to summarize");
+      toast.update(toastId, {
+        render: "❌ Failed to summarize",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
     }
   };
 
@@ -54,21 +72,100 @@ export default function NoteDetail() {
 
   if (!note) return <div className="text-white p-8">Loading note...</div>;
 
-  return (
-    <div className="min-h-screen bg-slate-900 text-white px-6 py-12">
-      <div className="max-w-3xl mx-auto bg-slate-800 p-6 rounded-xl shadow-lg">
-        <h1 className="text-3xl font-bold mb-2">{note.title}</h1>
-        <p className="text-sm text-slate-400 mb-1">{note.subject}</p>
-        <p className="text-sm italic mb-4 text-slate-300">{note.tags?.join(", ")}</p>
-        <p className="whitespace-pre-wrap text-slate-200 mb-6">{note.content}</p>
+  const ActionButtons = ({ vertical = false }) => (
+    <div className={`flex ${vertical ? "flex-col" : "flex-wrap"} gap-6`}>
+      <Link
+  to={`/notes/${note._id}/quiz/generate`}
+  state={{ from: location.pathname }} // ✅ Pass current page
+  className="btn-primary cursor-pointer"
+>
+  Generate Quiz
+</Link>
 
-        <div className="flex flex-wrap gap-3">
-          <button onClick={handleSummarize} className="btn-primary">Summarize</button>
-          <Link to={`/notes/edit/${note._id}`} className="btn-secondary">Edit</Link>
-          <button onClick={handleDelete} className="btn-danger">Delete</button>
-          <Link to="/notes" className="btn-secondary">⬅ Back to All Notes</Link>
-        </div>
+      <button onClick={handleSummarize} className="btn-primary cursor-pointer">
+        {summary ? "Re-Summarize" : "Summarize"}
+      </button>
+      <Link to={`/notes/edit/${note._id}`} className="btn-secondary cursor-pointer">
+        Edit
+      </Link>
+      <button onClick={handleDelete} className="btn-danger cursor-pointer">
+        Delete
+      </button>
+      
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-slate-900 text-white px-4 py-6 sm:px-6 sm:py-12 relative">
+      {/* 🔵 Mobile Action Toggle Button */}
+      <div className="sm:hidden absolute top-4 right-4 z-50">
+        <button
+          onClick={() => setMobileActionsOpen(!mobileActionsOpen)}
+          className="bg-blue-600 text-white rounded px-4 py-2 shadow hover:bg-blue-700"
+        >
+          ☰ Actions
+        </button>
       </div>
+
+      {/* 🔵 Mobile Actions Sidebar */}
+      {mobileActionsOpen && (
+        <div className="sm:hidden fixed top-16 right-4 w-72 bg-slate-800 p-4 rounded-xl shadow-lg z-40 border border-slate-600">
+          <ActionButtons vertical />
+        </div>
+      )}
+
+      {/* 🟢 Main Note Display */}
+      
+      <div className="max-w-3xl mx-auto bg-slate-800 p-4 sm:p-6 rounded-xl shadow-lg">
+
+  {/* 🔙 Back Button */}
+  <div className="mb-4">
+    <Link
+      to="/notes"
+      className="btn-secondary w-full sm:w-auto text-center block sm:inline-block"
+    >
+      ⬅ Back to All Notes
+    </Link>
+    <div className="hidden sm:flex">
+      <ActionButtons />
+    </div>
+  </div>
+
+  {/* 🖥️ Title + Desktop Buttons */}
+  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+    <div>
+      <h1 className="text-2xl sm:text-3xl font-bold break-words">{note.title}</h1>
+      <p className="text-sm text-slate-400 break-words">{note.subject}</p>
+      <p className="text-sm italic text-slate-300 break-words">
+        {note.tags?.join(", ")}
+      </p>
+    </div>
+
+    {/* 🟢 Desktop Buttons (Right Side) */}
+    
+  </div>
+
+  {/* 📝 Content */}
+  <div className="text-slate-200 whitespace-pre-wrap break-words mb-6">
+    {note.content}
+  </div>
+
+  {/* 📌 Summary */}
+  {summary && (
+    <div className="relative bg-slate-700 p-4 rounded mb-6 border border-slate-600">
+      <button
+        onClick={() => setSummary("")}
+        className="absolute top-2 right-3 text-slate-400 hover:text-red-400 text-xl"
+        title="Remove summary"
+      >
+        ×
+      </button>
+      <h3 className="text-lg font-semibold mb-2 text-green-300">Summary</h3>
+      <p className="text-slate-100 whitespace-pre-wrap break-words">{summary}</p>
+    </div>
+  )}
+</div>
+
     </div>
   );
 }

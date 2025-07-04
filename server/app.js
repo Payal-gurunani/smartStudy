@@ -5,6 +5,7 @@ import noteRoutes from './routes/note.routes.js';
 import flashcardRoutes from './routes/flashcard.routes.js';
 import studyScheduleRoutes from './routes/studySchedule.routes.js';
 import progressRoutes from './routes/progress.routes.js';
+import quizRoutes from './routes/quiz.routes.js';
 import cors from 'cors';
 const app = express();
 app.use(
@@ -23,6 +24,7 @@ app.get('/', (req, res) => {
 app.use('/api/v1/users',userRoutes)
 app.use('/api/v1/notes', noteRoutes);
 app.use('/api/v1/study-schedule', studyScheduleRoutes);
+app.use('/api/v1/quizzes',quizRoutes)
 app.use('/api/v1/flashcards',flashcardRoutes)
 app.use('/api/v1/progress',progressRoutes)
 app.use((err, req, res, next) => {

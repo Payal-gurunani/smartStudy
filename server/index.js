@@ -16,4 +16,3 @@ connectDb().then(()=>{
     console.log("Connection failed",error);
     
 })
-import "./cron/studyReminderCron.js"

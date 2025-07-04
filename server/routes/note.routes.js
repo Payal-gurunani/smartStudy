@@ -27,9 +27,7 @@ router.route("/:id")
   .delete(deleteNote);
 
 router.route("/upload-pdf").post(upload.single("pdf"), uploadPdfNote)
-router.route("/:id/genrate-quiz").post(generateQuizFromNote)
-router.route("/:id/submit-quiz").post(submitQuiz)
-router.route("/quiz-results").get(getUserQuizResults)
+
 router.route("/:id/summarize").post(summarizeNote)
 export default router;
   
