@@ -58,7 +58,7 @@ export default function Dashboard() {
           { path: "/flashcards", label: "🧠 Flashcards", desc: "Quick memory boosters" },
           { path: "/quizzes", label: "📝 Take Quiz", desc: "Test your knowledge" },
           { path: "/reminders", label: "⏰ Study Reminders", desc: "Never miss a topic" },
-          { path: "/progress", label: "📈 Progress Tracker", desc: "Track your growth" },
+          { path: "/profile", label: "📈 Progress Tracker", desc: "Track your growth" },
         ].map(({ path, label, desc }) => (
           <DashboardCard key={path} to={path} title={label} subtitle={desc} />
         ))}

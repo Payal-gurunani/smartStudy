@@ -18,13 +18,13 @@ export default function GuestHome() {
         <div className="space-x-4">
           <Link
             to="/register"
-            className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg text-white font-semibold shadow"
+            className="bg-orange-500 hover:bg-orange-600 px-6 py-2 rounded-lg text-white font-semibold shadow cursor-pointer"
           >
             Get Started
           </Link>
           <Link
             to="/"
-            className="border border-white/20 hover:bg-white/10 px-6 py-2 rounded-lg text-white font-medium"
+            className="border border-white/20 hover:bg-white/10 px-6 py-2 rounded-lg text-white font-medium cursor-pointer"
           >
             Login
           </Link>

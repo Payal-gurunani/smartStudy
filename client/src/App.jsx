@@ -21,6 +21,7 @@ import QuizAttemptPage from "./pages/quizes/QuizAttempt.jsx";
 import QuizSingleResultPage from "./pages/quizes/QuizSingleResultPage.jsx";
 import Quizzess from "./pages/quizes/Quizzess.jsx";
 import FlashcardList from "./pages/flashcards/FlashcardList.jsx";
+import Reminders from "./pages/Reminders/Reminders.jsx";
 function App() {
   const location = useLocation();
 
@@ -41,13 +42,13 @@ function App() {
               </ProtectedRoute>
             }
           />
-          <Route 
-          path="flashcards"
-          element={
-            <ProtectedRoute>
-              <FlashcardList />
-            </ProtectedRoute>
-          }
+          <Route
+            path="flashcards"
+            element={
+              <ProtectedRoute>
+                <FlashcardList />
+              </ProtectedRoute>
+            }
           />
           <Route
             path="profile"
@@ -133,15 +134,14 @@ function App() {
             }
           />
 
-        <Route
-  path="/quizzes/by-note/:noteId"
-  element={
-    <ProtectedRoute>
-      <QuizAttemptPage />
-    </ProtectedRoute>
-  }
-/>
-
+          <Route
+            path="/quizzes/by-note/:noteId"
+            element={
+              <ProtectedRoute>
+                <QuizAttemptPage />
+              </ProtectedRoute>
+            }
+          />
 
           <Route
             path="/quizzes/result/:id"
@@ -160,6 +160,15 @@ function App() {
                 <Quizzess />
               </ProtectedRoute>
             }
+          />
+
+          <Route
+          path="/reminders"
+          element={
+            <ProtectedRoute>
+              <Reminders />
+            </ProtectedRoute>
+          }
           />
 
         </Route>

@@ -7,23 +7,7 @@ import { FiLogOut, FiUser } from 'react-icons/fi';
 const Header = () => {
   const navigate = useNavigate();
   const location = useLocation();
-  const { isAuthenticated, setIsAuthenticated } = useAuth();
-
-  const handleLogout = async () => {
-    try {
-      await apiRequest({
-        method: endpoints.logout.method,
-        url: endpoints.logout.url,
-      });
-    } catch (err) {
-      console.error('Logout error:', err.message);
-    } finally {
-      localStorage.removeItem('token');
-      localStorage.removeItem('visitedBefore');
-      setIsAuthenticated(false);
-      navigate('/');
-    }
-  };
+  const { isAuthenticated } = useAuth();
 
   const isActive = (path) => location.pathname === path;
 
@@ -66,13 +50,6 @@ const Header = () => {
                 Profile
               </Link>
 
-              <button
-                onClick={handleLogout}
-                className="flex items-center gap-2 bg-[#E4580B] hover:bg-red-600 px-4 py-1.5 rounded-lg transition text-white font-semibold shadow-sm"
-              >
-                <FiLogOut className="text-lg" />
-                Logout
-              </button>
             </>
           )}
         </nav>

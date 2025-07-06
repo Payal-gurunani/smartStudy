@@ -153,7 +153,7 @@ const location = useLocation();
   <div className="mb-4">
     <Link
       to="/notes"
-      className="btn-secondary w-full sm:w-auto text-center block sm:inline-block"
+      className="btn-secondary w-full cursor-pointer sm:w-auto text-center block sm:inline-block"
     >
       ⬅ Back to All Notes
     </Link>

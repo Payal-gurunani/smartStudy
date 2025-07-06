@@ -106,7 +106,7 @@ export default function EditNote() {
 
           <button
             type="submit"
-            className="w-full bg-yellow-600 py-2 rounded hover:bg-yellow-700 transition font-medium"
+            className="w-full bg-yellow-600 py-2 rounded hover:bg-yellow-700 transition font-medium cursor-pointer"
           >
             💾 Save Changes
           </button>

@@ -120,8 +120,6 @@ export const searchFlashcards = asyncHandler(async (req, res) => {
   }
 
   const flashcards = await Flashcard.find(filter).sort({ updatedAt: -1 });
-console.log(flashcards, "Flashcards found");
-
   res.status(200).json(new ApiResponse(200, flashcards, "Flashcards fetched"));
 });
 

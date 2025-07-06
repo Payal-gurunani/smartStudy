@@ -1,3 +1,5 @@
+import { method } from "lodash";
+
 export const endpoints = {
   //   Auth
   login: { method: "POST", url: "/users/login" },
@@ -33,4 +35,22 @@ export const endpoints = {
     method: "GET",
     url: "/flashcards/search",
   },
+   
+  progress : {
+    method: "GET",
+    url: "/progress",
+  }
+  ,
+  flashcardReview: {
+  method: "POST",
+  url: "/progress/flashcard-review",
+},
+reminders: {
+  getAll: { method: "GET", url: "/study-schedule" },
+  create: { method: "POST", url: "/study-schedule" },
+  updateStatus: (id) => ({ method: "PATCH", url: `/study-schedule/${id}` }),
+  delete: (id) => ({ method: "DELETE", url: `/study-schedule/${id}` }),
+}
+
 };
+

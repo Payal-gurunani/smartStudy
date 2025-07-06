@@ -79,7 +79,7 @@ export default function CreateNote() {
 
           <button
             type="submit"
-            className="w-full bg-blue-600 py-2 rounded hover:bg-blue-700 transition font-medium"
+            className="w-full bg-blue-600 py-2 rounded hover:bg-blue-700 transition font-medium cursor-pointer"
           >
             ➕ Create Note
           </button>
