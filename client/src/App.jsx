@@ -20,6 +20,7 @@ import QuizResultsPage from "./pages/quizes/QuizResults.jsx";
 import QuizAttemptPage from "./pages/quizes/QuizAttempt.jsx";
 import QuizSingleResultPage from "./pages/quizes/QuizSingleResultPage.jsx";
 import Quizzess from "./pages/quizes/Quizzess.jsx";
+import FlashcardList from "./pages/flashcards/FlashcardList.jsx";
 function App() {
   const location = useLocation();
 
@@ -40,7 +41,14 @@ function App() {
               </ProtectedRoute>
             }
           />
-
+          <Route 
+          path="flashcards"
+          element={
+            <ProtectedRoute>
+              <FlashcardList />
+            </ProtectedRoute>
+          }
+          />
           <Route
             path="profile"
             element={

@@ -4,6 +4,7 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import OpenAI from "openai";
 import { Flashcard } from "../models/flashcard.model.js";
+
 const openai = new OpenAI({
   apiKey: process.env.OPENROUTER_API_KEY,
   baseURL: "https://openrouter.ai/api/v1",
@@ -95,20 +96,34 @@ await Flashcard.insertMany(flashcardsToSave);
   res.status(200).json(new ApiResponse(200, flashcards, "Flashcards generated successfully"));
 });
 
-
 export const searchFlashcards = asyncHandler(async (req, res) => {
-  const { query, subject, tag } = req.query;
+  const { query = "", subject = "", tag = "" } = req.query;
 
   const filter = { user: req.user._id };
-  if (subject) filter.subject = subject;
-  if (tag) filter.tags = tag;
-  if (query) filter.$text = { $search: query };
+
+  // --- SUBJECT: case‑insensitive partial match --------------
+  if (subject) {
+    filter.subject = { $regex: subject, $options: "i" };
+  }
+
+  if (tag) {
+    filter.tags = { $regex: tag, $options: "i" };
+  }
+
+  // --- MAIN SEARCH ACROSS Q + A + SUBJECT -------------------
+  if (query) {
+    filter.$or = [
+      { question: { $regex: query, $options: "i" } },
+      { answer:   { $regex: query, $options: "i" } },
+      { subject:  { $regex: query, $options: "i" } },
+    ];
+  }
 
   const flashcards = await Flashcard.find(filter).sort({ updatedAt: -1 });
+console.log(flashcards, "Flashcards found");
 
   res.status(200).json(new ApiResponse(200, flashcards, "Flashcards fetched"));
 });
-
 
 export const summarizeNote = asyncHandler(async (req, res) => {
   const { id } = req.params;

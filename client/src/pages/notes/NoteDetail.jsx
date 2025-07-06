@@ -11,6 +11,8 @@ export default function NoteDetail() {
   const [note, setNote] = useState(null);
   const [summary, setSummary] = useState("");
   const [mobileActionsOpen, setMobileActionsOpen] = useState(false);
+  const [generatingFlashcards, setGeneratingFlashcards] = useState(false);
+
 const location = useLocation();
   const fetchNote = async () => {
     try {
@@ -37,7 +39,7 @@ const location = useLocation();
 
       setSummary(newSummary);
       toast.update(toastId, {
-        render: "✅ Summary generated!",
+        render: "Summary generated!",
         type: "success",
         isLoading: false,
         autoClose: 3000,
@@ -45,7 +47,7 @@ const location = useLocation();
     } catch (error) {
       console.error("Summarize failed", error);
       toast.update(toastId, {
-        render: "❌ Failed to summarize",
+        render: "Failed to summarize",
         type: "error",
         isLoading: false,
         autoClose: 3000,
@@ -76,7 +78,7 @@ const location = useLocation();
     <div className={`flex ${vertical ? "flex-col" : "flex-wrap"} gap-6`}>
       <Link
   to={`/notes/${note._id}/quiz/generate`}
-  state={{ from: location.pathname }} // ✅ Pass current page
+  state={{ from: location.pathname }} 
   className="btn-primary cursor-pointer"
 >
   Generate Quiz
@@ -91,7 +93,36 @@ const location = useLocation();
       <button onClick={handleDelete} className="btn-danger cursor-pointer">
         Delete
       </button>
-      
+     <button
+  className={`btn-primary cursor-pointer ${generatingFlashcards ? "opacity-50 cursor-not-allowed" : ""}`}
+  disabled={generatingFlashcards}
+  onClick={async () => {
+    setGeneratingFlashcards(true);
+    const toastId = toast.loading("Generating flashcards...");
+    try {
+      await apiRequest(endpoints.generateFlashcards(note._id));
+      toast.update(toastId, {
+        render: "Flashcards generated!",
+        type: "success",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    } catch (err) {
+      toast.update(toastId, {
+        render: "Failed to generate flashcards.",
+        type: "error",
+        isLoading: false,
+        autoClose: 3000,
+      });
+    } finally {
+      setGeneratingFlashcards(false);
+    }
+  }}
+>
+  {generatingFlashcards ? "Generating..." : "Generate Flashcards"}
+</button>
+
+
     </div>
   );
 
@@ -140,8 +171,6 @@ const location = useLocation();
         {note.tags?.join(", ")}
       </p>
     </div>
-
-    {/* 🟢 Desktop Buttons (Right Side) */}
     
   </div>
 

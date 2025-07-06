@@ -9,10 +9,10 @@ const GenrateQuiz = () => {
   const { noteId } = useParams();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const calledRef = useRef(false); // ✅ Single ref to guard duplicate execution
+  const calledRef = useRef(false); 
 const location = useLocation();
   useEffect(() => {
-    if (calledRef.current) return; // 🛑 prevent double call (especially in StrictMode)
+    if (calledRef.current) return; 
     calledRef.current = true;
 
     let called = false;
@@ -48,10 +48,10 @@ const location = useLocation();
         // Step 2: Generate new quiz
         const res = await apiRequest(endpoints.generateQuiz(noteId));
         localStorage.setItem(`quiz-${noteId}`, JSON.stringify(res));
-        toast.success("✅ New quiz generated!");
+        toast.success(" New quiz generated!");
         navigate(`/quizzes/${noteId}/attempt`);
       } catch (err) {
-        toast.error(err.response?.data?.message || "❌ Quiz generation failed");
+        toast.error(err.response?.data?.message || " Quiz generation failed");
         setLoading(false);
       }
     })();

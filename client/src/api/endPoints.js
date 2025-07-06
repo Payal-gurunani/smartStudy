@@ -23,4 +23,14 @@ export const endpoints = {
   getQuizByNoteId: (noteId) => ({ method: "GET", url: `/quizzes/by-note/${noteId}` }),
   getAllQuizStatus: { method: "GET", url: "/quizzes/all-status" },
 
+
+  // Flashcards
+  generateFlashcards: (noteId) => ({
+    method: "POST",
+    url: `flashcards/${noteId}/generate-flashcards`,
+  }),
+  searchFlashcards: {
+    method: "GET",
+    url: "/flashcards/search",
+  },
 };
