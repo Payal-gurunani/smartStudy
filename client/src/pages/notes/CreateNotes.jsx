@@ -21,7 +21,7 @@ export default function CreateNote() {
         data: { ...note, tags: note.tags.split(",") },
       });
       toast.success("Note created");
-      navigate("/notes");
+      navigate("/notes/view");
     } catch {
       toast.error("Creation failed");
     }

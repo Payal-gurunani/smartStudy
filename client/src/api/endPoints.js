@@ -45,6 +45,7 @@ export const endpoints = {
   method: "POST",
   url: "/progress/flashcard-review",
 },
+// Reminders
 reminders: {
   getAll: { method: "GET", url: "/study-schedule" },
   create: { method: "POST", url: "/study-schedule" },

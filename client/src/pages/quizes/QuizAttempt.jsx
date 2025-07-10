@@ -12,6 +12,7 @@ const QuizAttemptPage = () => {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState({});
   const [loading, setLoading] = useState(true);
+  const [noteTitle, setNoteTitle] = useState("");
 
   useEffect(() => {
     const loadQuiz = async () => {
@@ -22,6 +23,8 @@ const QuizAttemptPage = () => {
         try {
           const { method, url } = endpoints.getNote(noteId);
           const res = await apiRequest({ method, url });
+          setNoteTitle(res.title);
+
 
           if (res.quiz && res.quiz.length > 0) {
             setQuiz(res.quiz);
@@ -40,8 +43,9 @@ const QuizAttemptPage = () => {
     loadQuiz();
   }, [noteId, navigate]);
 
-  const handleOption = (key) =>
+  const handleOption = (key) => {
     setAnswers((prev) => ({ ...prev, [current]: key }));
+  };
 
   const handleSubmit = async () => {
     const payload = {
@@ -52,86 +56,119 @@ const QuizAttemptPage = () => {
     };
 
     try {
-      const res = await apiRequest({
+      await apiRequest({
         method: endpoints.submitQuiz.method,
         url: endpoints.submitQuiz.url,
         data: payload,
       });
 
-      toast.success("Submitted successfully 🏆");
+      toast.success("Quiz submitted successfully 🎉");
       localStorage.removeItem(`quiz-${noteId}`);
       navigate("/quizzes/results");
     } catch (err) {
-      toast.error("Failed to submit quiz ❌");
+      toast.error("Submission failed ❌");
       console.error(err);
     }
   };
 
-  if (loading) return <p className="text-center mt-10 text-gray-600">Loading quiz...</p>;
+  if (loading) return <p className="text-center mt-10 text-gray-400">Loading quiz...</p>;
   if (!quiz || quiz.length === 0) return <p className="text-center text-red-500">Quiz not available.</p>;
 
   const q = quiz[current];
+  console.log(quiz);
+
   const selected = answers[current];
+  const percent = ((current + 1) / quiz.length) * 100;
 
   return (
-    <div className="max-w-2xl mx-auto p-6">
-      <motion.div
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="bg-white shadow-lg rounded-xl p-6"
-      >
-        <h2 className="text-lg font-bold mb-4">
-          Question {current + 1} of {quiz.length}
-        </h2>
+    <div className="min-h-screen bg-slate-900 text-white py-10 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-3xl mx-auto bg-slate-800 shadow-2xl rounded-xl p-6 sm:p-10">
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+        >
+          <div className="mt-6 text-center">
+            <button
+              onClick={() => {
+                const confirmExit = window.confirm("Are you sure you want to end the test without submitting?");
+                if (confirmExit) {
+                  localStorage.removeItem(`quiz-${noteId}`);
+                  navigate("/quizzes");
+                }
+              }}
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded"
+            >
+              End Test
+            </button>
+          </div>
 
-        <p className="mb-6 text-gray-800">{q.question}</p>
+<h1 className="text-2xl sm:text-3xl font-bold mb-1 overflow-hidden">Quiz: {noteTitle}</h1>
+          <p className="text-sm text-blue-400 mb-4">
+            Question {current + 1} of {quiz.length}
+          </p>
 
-        {Object.entries(q.options).map(([key, text]) => (
-          <label
-            key={key}
-            className={`block border rounded p-2 mb-2 cursor-pointer transition-all ${
-              selected === key
-                ? "bg-blue-100 border-blue-500"
-                : "hover:bg-gray-100"
-            }`}
-          >
-            <input
-              type="radio"
-              name={`question-${current}`}
-              className="mr-2"
-              checked={selected === key}
-              onChange={() => handleOption(key)}
+          {/* Progress Bar */}
+          <div className="w-full h-2 bg-slate-700 rounded-full mb-6 overflow-hidden">
+            <div
+              className="h-2 bg-blue-500 rounded-full transition-all"
+              style={{ width: `${percent}%` }}
             />
-            {key}. {text}
-          </label>
-        ))}
+          </div>
 
-        <div className="flex justify-between mt-6">
-          <button
-            onClick={() => setCurrent((prev) => prev - 1)}
-            disabled={current === 0}
-            className="px-4 py-2 bg-gray-300 text-black rounded disabled:opacity-50"
-          >
-            Previous
-          </button>
+          {/* Question */}
+          <p className="text-lg mb-6 text-slate-100">{q.question}</p>
 
-          {current === quiz.length - 1 ? (
+          {/* Options */}
+          <div className="space-y-3">
+            {Object.entries(q.options).map(([key, text]) => (
+              <label
+                key={key}
+                className={`flex items-center border rounded-lg px-4 py-3 cursor-pointer transition-all
+                ${selected === key
+                    ? "bg-blue-600 border-blue-500 text-white"
+                    : "bg-slate-700 border-slate-600 hover:bg-slate-600"
+                  }`}
+              >
+                <input
+                  type="radio"
+                  name={`question-${current}`}
+                  className="mr-3 h-5 w-5 text-blue-400 accent-blue-500"
+                  checked={selected === key}
+                  onChange={() => handleOption(key)}
+                />
+                <span className="text-sm sm:text-base">{key}. {text}</span>
+              </label>
+            ))}
+          </div>
+          {/* Navigation */}
+          <div className="flex justify-between items-center mt-6">
             <button
-              onClick={handleSubmit}
-              className="px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
+              disabled={current === 0}
+              onClick={() => setCurrent((prev) => prev - 1)}
+              className="bg-slate-600 hover:bg-slate-500 text-white font-medium py-2 px-4 rounded disabled:opacity-50"
             >
-              Submit
+              Previous
             </button>
-          ) : (
-            <button
-              onClick={() => setCurrent((prev) => prev + 1)}
-              className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
-            >
-              Next
-            </button>
-          )}
-        </div>
-      </motion.div>
+
+            {current === quiz.length - 1 ? (
+              <button
+                onClick={handleSubmit}
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded"
+              >
+                Submit
+              </button>
+            ) : (
+              <button
+                onClick={() => setCurrent((prev) => prev + 1)}
+                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded"
+              >
+                Next
+              </button>
+            )}
+          </div>
+        </motion.div>
+      </div>
     </div>
   );
 };

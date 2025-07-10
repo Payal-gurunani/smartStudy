@@ -3,10 +3,14 @@ import { apiRequest } from "../../api/apiRequest";
 import { endpoints } from "../../api/endPoints";
 import { Link } from "react-router-dom";
 import { toast } from "react-toastify";
-import { motion } from "framer-motion";
+import { FiFileText, FiMenu } from "react-icons/fi";
+import Sidebar from "../../components/Sidebar";
 
 export default function NotesList() {
   const [notes, setNotes] = useState([]);
+  const [activeTab, setActiveTab] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const fetchNotes = async () => {
     try {
@@ -23,94 +27,122 @@ export default function NotesList() {
       toast.error("Failed to fetch notes");
     }
   };
-  const handleSummarizeNote = async (id) => {
-    try {
-      const { method, url } = endpoints.summarizeNote(id);
-      const res = await apiRequest({ method, url });
-
-      const summary = typeof res === "string" ? res : res?.summary || res?.data?.summary;
-
-      if (!summary) throw new Error("No summary returned");
-
-      toast.info("📌 Summary: " + summary, { autoClose: 8000 });
-    } catch (error) {
-      console.error("Summarization error:", error);
-      toast.error("Failed to summarize note.");
-    }
-  };
-
-  const deleteNote = async (id) => {
-    if (!window.confirm("Are you sure you want to delete this note?")) return;
-    try {
-      const { method, url } = endpoints.deleteNote(id);
-      await apiRequest({ method, url });
-      toast.success("Note deleted");
-      fetchNotes();
-    } catch (error) {
-      console.error("Delete error:", error);
-      toast.error("Delete failed");
-    }
-  };
 
   useEffect(() => {
     fetchNotes();
   }, []);
 
+  const filteredNotes = notes.filter((note) =>
+    note.title.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white px-4 py-10">
-      <div className="max-w-6xl mx-auto">
-        <div className="flex justify-between items-center mb-8">
-          <h2 className="text-3xl font-bold">📝 Your Notes</h2>
-          <div className="space-x-3">
-            <Link to="/notes/create" className="btn-primary">+ Create more notes?</Link>
-            <Link to="/notes/upload" className="btn-secondary">+Upload PDF for notes?</Link>
+    <div className="flex min-h-screen bg-gradient-to-br from-slate-900 to-slate-800 text-white">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
+      <main className="flex-1 sm:ml-60 px-4 sm:px-6 py-6 sm:py-8 w-full">
+        <div className="max-w-4xl mx-auto">
+
+          {/* Mobile Top Bar */}
+          <div className="sm:hidden flex flex-col gap-3 mb-4">
+            <div className="flex justify-between items-center">
+              <button onClick={() => setIsSidebarOpen(true)}>
+                <FiMenu className="text-2xl" />
+              </button>
+              <div className="flex gap-2">
+                <Link
+                  to="/notes/create"
+                  className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm"
+                >
+                  + New Note
+                </Link>
+                <Link
+                  to="/notes/upload"
+                  className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm"
+                >
+                  Upload PDF
+                </Link>
+              </div>
+            </div>
           </div>
-        </div>
 
-        {notes.length === 0 ? (
-          <p className="text-slate-400">No notes found.</p>
-        ) : (
-          <motion.div
-            className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-            initial="hidden"
-            animate="visible"
-            variants={{
-              hidden: { opacity: 0 },
-              visible: {
-                opacity: 1,
-                transition: { staggerChildren: 0.1 },
-              },
-            }}
-          >
-            {notes.map((note) => (
-              <motion.div
-                key={note._id}
-                className="bg-white/10 backdrop-blur-lg border border-white/10 rounded-xl p-5 shadow-lg hover:shadow-blue-500/20 transition-all duration-200 flex flex-col justify-between"
-                whileHover={{ scale: 1.02 }}
+          {/* Desktop Top Bar */}
+          <div className="hidden sm:flex justify-between items-center mb-6">
+            <h2 className="text-3xl font-bold">Notes</h2>
+            <div className="flex gap-3">
+              <Link
+                to="/notes/upload"
+                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm"
               >
-                <div>
-                  <Link to={`/notes/${note._id}`} className="text-xl font-semibold mb-1 line-clamp-2 hover:underline">
-                    {note.title}
-                  </Link>
-                  <p className="text-sm text-slate-300 mb-1">{note.subject}</p>
-                  <p className="text-sm text-slate-400 italic mb-3">
-                    {note.tags?.join(", ")}
-                  </p>
-                  <p className="line-clamp-3 text-slate-200 text-sm">
-                    {note.content?.slice(0, 120) || "No content..."}
-                  </p>
-                </div>
+                Upload PDF
+              </Link>
+              <Link
+                to="/notes/create"
+                className="bg-white/10 hover:bg-white/20 text-white px-4 py-2 rounded-full text-sm"
+              >
+                + New Note
+              </Link>
+            </div>
+          </div>
 
-                <div className="flex justify-end items-center mt-4 space-x-2">
-                  <Link to={`/notes/edit/${note._id}`} className="btn-secondary">Edit</Link>
-                  <button onClick={() => deleteNote(note._id)} className="btn-danger">Delete</button>
-                </div>
-              </motion.div>
-            ))}
-          </motion.div>
-        )}
-      </div>
+          {/* Search Input */}
+          <div className="mb-4">
+            <input
+              type="text"
+              placeholder="Search notes"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full bg-white/10 text-white placeholder-gray-300 px-4 py-2 rounded-lg focus:outline-none"
+            />
+          </div>
+
+          {/* Tabs */}
+          <div className="flex gap-6 mb-5 border-b border-white/20 pb-1 text-sm">
+            <button
+              onClick={() => setActiveTab("all")}
+              className={`pb-1 ${
+                activeTab === "all"
+                  ? "border-b-2 border-blue-400 text-white"
+                  : "text-gray-400"
+              }`}
+            >
+              All Notes
+            </button>
+            <button
+              onClick={() => setActiveTab("subjects")}
+              className={`pb-1 ${
+                activeTab === "subjects"
+                  ? "border-b-2 border-blue-400 text-white"
+                  : "text-gray-400"
+              }`}
+            >
+              Subjects
+            </button>
+          </div>
+
+          {/* Notes */}
+          {filteredNotes.length === 0 ? (
+            <p className="text-gray-400">No notes found.</p>
+          ) : (
+            <div className="space-y-4">
+              <h3 className="text-md font-semibold text-white">Recent</h3>
+              {filteredNotes.map((note) => (
+                <Link
+                  to={`/notes/${note._id}`}
+                  key={note._id}
+                  className="flex items-center gap-3 p-4 bg-white/10 hover:bg-white/20 rounded-lg transition"
+                >
+                  <FiFileText className="text-white text-xl" />
+                  <div>
+                    <h4 className="text-white font-medium">{note.title}</h4>
+                    <p className="text-sm text-blue-300">{note.subject || "No subject"}</p>
+                  </div>
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+      </main>
     </div>
   );
 }

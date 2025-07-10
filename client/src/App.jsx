@@ -7,7 +7,6 @@ import Login from "./authentication/Login.jsx";
 import Register from "./authentication/Register.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import ProtectedRoute from "./components/ProtectedRoute.jsx";
-import Notes from "./pages/notes/Notes.jsx"; // ✅ import
 import NotesList from "./pages/notes/NotesList.jsx";
 import CreateNote from "./pages/notes/CreateNotes.jsx";
 import EditNote from "./pages/notes/EditNotes.jsx";
@@ -67,14 +66,6 @@ function App() {
             }
           />
 
-          <Route
-            path="notes"
-            element={
-              <ProtectedRoute>
-                <Notes />
-              </ProtectedRoute>
-            }
-          />
           <Route
             path="notes/view"
             element={

@@ -12,7 +12,7 @@ const Header = () => {
   const isActive = (path) => location.pathname === path;
 
   return (
-    <header className="bg-[#0f1b32] text-white px-6 py-4 shadow-md sticky top-0 z-50">
+    <header className="bg-[#0f1b32] text-white px-6 py-4 shadow-md sticky top-0 z-50 ">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
         {/* Logo */}
         <Link to="/home" className="text-2xl font-bold tracking-wide hover:text-orange-200 transition">
