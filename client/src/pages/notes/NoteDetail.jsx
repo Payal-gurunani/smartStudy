@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { apiRequest } from "../../api/apiRequest";
 import { endpoints } from "../../api/endPoints";
 import { toast } from "react-toastify";
+import {confirmToast} from '../../utils/confirmToast'
 
 export default function NoteDetail() {
   const { id } = useParams();
@@ -54,18 +55,25 @@ export default function NoteDetail() {
     }
   };
 
-  const handleDelete = async () => {
-    if (!window.confirm("Are you sure you want to delete this note?")) return;
-    try {
-      const { method, url } = endpoints.deleteNote(id);
-      await apiRequest({ method, url });
-      toast.success("Note deleted");
-      navigate("/notes/view");
-    } catch (error) {
-      toast.error("Failed to delete");
-    }
-  };
+const handleDelete = async () => {
+  const confirmed = await confirmToast({
+    title: "Delete this note?",
+    message: "This action cannot be undone.",
+    confirmLabel: "Delete",
+    cancelLabel: "Cancel",
+  });
 
+  if (!confirmed) return;
+
+  try {
+    const { method, url } = endpoints.deleteNote(id);
+    await apiRequest({ method, url });
+    toast.success("✅ Note deleted");
+    navigate("/notes/view");
+  } catch (error) {
+    toast.error("❌ Failed to delete");
+  }
+};
   if (!note) return <div className="text-white p-8">Loading note...</div>;
 
   return (

@@ -1,122 +1,134 @@
+// src/pages/Profile.jsx
 import { useEffect, useState } from "react";
 import { apiRequest } from "../api/apiRequest";
 import { endpoints } from "../api/endPoints";
-import { FiLogOut } from 'react-icons/fi';
+import { FiLogOut, FiMenu } from "react-icons/fi";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/Authcontext";
+import Sidebar from "../components/Sidebar";
+import { Loader2 } from "lucide-react";
+
 export default function Profile() {
-  const [profile, setProfile] = useState(null);
+  const [profile, setProfile]       = useState(null);
   const [notesCount, setNotesCount] = useState(0);
-  const [progress, setProgress] = useState(null);
+  const [progress, setProgress]     = useState(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-    const { setIsAuthenticated } = useAuth();
-  
+  const { setIsAuthenticated } = useAuth();
+
+  /* ───────── Logout ───────── */
   const handleLogout = async () => {
-  try {
-    await apiRequest({
-      method: endpoints.logout.method,
-      url: endpoints.logout.url,
-    });
-  } catch (err) {
-    console.error('Logout error:', err.message);
-  } finally {
-    localStorage.removeItem('token');
-    localStorage.removeItem('visitedBefore' ,'true');
-    
-    // Remove all quiz-<noteId> entries
-    Object.keys(localStorage).forEach((key) => {
-      if (key.startsWith("quiz-")) {
-        localStorage.removeItem(key);
-      }
-    });
+    try {
+      await apiRequest(endpoints.logout);
+    } catch (err) {
+      console.error("Logout error:", err);
+    } finally {
+     
+      setIsAuthenticated(false);
+      navigate("/");
+    }
+  };
 
-    setIsAuthenticated(false);
-    navigate('/');
-  }
-};
-
+  /* ───────── Fetch profile / stats ───────── */
   useEffect(() => {
-    const fetchData = async () => {
+    (async () => {
       try {
-        const profileRes = await apiRequest({
-          method: endpoints.Profile.method,
-          url: endpoints.Profile.url,
-        });
+        const profileRes  = await apiRequest(endpoints.Profile);
+        const notesRes    = await apiRequest(endpoints.getNotes);
+        const progressRes = await apiRequest({ method: "GET", url: "/progress" });
 
         setProfile(profileRes);
-
-        const notesRes = await apiRequest({
-          method: endpoints.getNotes.method,
-          url: endpoints.getNotes.url,
-        });
         setNotesCount(notesRes.length || 0);
-
-        const progressRes = await apiRequest({
-          method: "GET",
-          url: "/progress",
-        });
-       
         setProgress(progressRes);
       } catch (err) {
-        console.error("Failed to load profile, notes, or progress", err);
+        console.error("Failed to load profile data", err);
       }
-    };
-
-    fetchData();
+    })();
   }, []);
 
+  /* ───────── Loader ───────── */
   if (!profile || !progress) {
-    return <div className="text-white p-8">Loading profile...</div>;
+    return (
+      <div className="grid min-h-screen place-items-center bg-slate-900 text-white">
+        <span className="flex items-center gap-2 text-white/80">
+          <Loader2 className="w-6 h-6 animate-spin" />
+          Loading profile…
+        </span>
+      </div>
+    );
   }
 
   const joinedYear = new Date(profile.createdAt).getFullYear();
 
+  /* ───────── JSX ───────── */
   return (
-    <div className="min-h-screen bg-gray-900 px-6 py-12 text-gray-100">
-      <div className="max-w-3xl mx-auto bg-gray-900 rounded-2xl shadow-lg p-8">
-        <div className="flex flex-col items-center text-center">
-          
-          <h2 className="text-2xl font-bold">{profile.username}</h2>
-          <p className="text-sm text-gray-500">{profile.email}</p>
-          <p className="text-sm text-gray-400">Joined in {joinedYear}</p>
-          
-        </div>
+    <div className="flex bg-slate-900 min-h-screen text-white">
+      {/* Sidebar */}
+      <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-        <h3 className="mt-10 text-xl font-semibold">Study Progress</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4 ">
-          <Card title="Courses Completed" value={progress.quizzes.totalQuizzes} />
-          <Card title="Average Score" value={`${progress.quizzes.avgScore}%`} />
-          <Card title="Notes Created" value={notesCount} />
-          <Card title="Flashcards Reviewed" value={progress.flashcards.totalFlashcardReviews} />
-          <Card title="Reminders Completed" value={progress.reminders.completed} />
-          <Card title="Pending Reminders" value={progress.reminders.pending} />
-        </div>
+      {/* Main */}
+      <main className="flex-1 w-full px-4 py-6 sm:px-10 sm:py-10 sm:ml-60">
+        <div className="mx-auto max-w-3xl">
+          {/* Mobile Top Bar */}
+          <div className="sm:hidden flex justify-between items-center mb-6">
+            <button onClick={() => setSidebarOpen(true)}>
+              <FiMenu className="text-2xl" />
+            </button>
+            <h1 className="text-lg font-semibold">Profile</h1>
+          </div>
 
-        <h3 className="mt-10 text-xl font-semibold">Settings</h3>
-        <div className="space-y-2 mt-4">
-          {["Account Settings", "Notifications", "Privacy", "Help & Support"].map((item, idx) => (
-            <div key={idx} className="flex justify-between items-center p-3 bg-gray-900 rounded-lg hover:bg-gray-800 cursor-pointer">
-              <span>{item}</span>
-              <span className="text-gray-300">→</span>
+          {/* Profile Card */}
+          <div className="bg-white/5 ring-1 ring-white/10 rounded-2xl shadow-lg p-8">
+            <div className="flex flex-col items-center text-center gap-1">
+              <h2 className="text-2xl font-bold">{profile.username}</h2>
+              <p className="text-sm text-gray-300">{profile.email}</p>
+              <p className="text-sm text-gray-400">Joined in {joinedYear}</p>
             </div>
-          ))}
-          <button
-            onClick={handleLogout}
-            className="w-full flex items-center gap-2 bg-[#E4580B] hover:bg-red-600 px-4 py-1.5 rounded-lg transition text-white font-semibold shadow-sm cursor-pointer justify-center"
-          >
-            <FiLogOut className="text-lg" />
-            Logout
-          </button>
+
+            {/* Progress */}
+            <h3 className="mt-10 text-xl font-semibold">Study Progress</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 mt-4">
+              <Card title="Quizzes Taken"   value={progress.quizzes.totalQuizzes} />
+              <Card title="Average Score"   value={`${progress.quizzes.avgScore}%`} />
+              <Card title="Notes Created"   value={notesCount} />
+              <Card title="Flashcards Reviewed" value={progress.flashcards.totalFlashcardReviews} />
+              <Card title="Reminders Done"  value={progress.reminders.completed} />
+              <Card title="Pending Reminders" value={progress.reminders.pending} />
+            </div>
+
+            {/* Settings */}
+            <h3 className="mt-10 text-xl font-semibold">Settings</h3>
+            <div className="space-y-2 mt-4">
+              {["Account Settings", "Notifications", "Privacy", "Help & Support"].map((item) => (
+                <div
+                  key={item}
+                  className="flex justify-between items-center bg-white/5 hover:bg-white/10 p-3 rounded-lg cursor-pointer"
+                >
+                  <span>{item}</span>
+                  <span className="text-gray-300">→</span>
+                </div>
+              ))}
+
+              <button
+                onClick={handleLogout}
+                className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 py-2 rounded-lg font-semibold mt-4"
+              >
+                <FiLogOut className="text-lg" />
+                Logout
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
+      </main>
     </div>
   );
 }
 
+/* ───────── Small stat card ───────── */
 function Card({ title, value }) {
   return (
-    <div className="bg-gray-800 hover:bg-gray-700 rounded-lg p-4 shadow-sm text-center text-white">
-      <p className="text-sm text-gray-100 ">{title}</p>
+    <div className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-center ring-1 ring-white/10">
+      <p className="text-sm text-gray-300">{title}</p>
       <p className="text-xl font-bold">{value}</p>
     </div>
   );

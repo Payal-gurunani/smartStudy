@@ -55,7 +55,6 @@ const [loginError, setLoginError] = useState("");
       data: formData,
     });
 
-    localStorage.setItem("token", res.token);
     setAuthToken(res.token);
     setUser(res.user || res.data.user);
     setIsAuthenticated(true);

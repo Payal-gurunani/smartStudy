@@ -70,7 +70,6 @@ const passwordMatch = await user.matchPassword(password);
    .cookie("token", token, tokenOptions)
   .json(
     new ApiResponse(200,{
-        token,
         user:userLogin,
     },"Successfully login")
   )

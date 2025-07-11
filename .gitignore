@@ -11,6 +11,7 @@ yarn-error.log*
 
 # Build output
 dist/
+client/dist/
 build/
 
 # OS generated files

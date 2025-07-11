@@ -1,56 +1,45 @@
-import { createContext, useContext, useState, useEffect } from "react";
-import axiosInstance, { setAuthToken } from "../api/axiosInstance.js";
-import { apiRequest } from "../api/apiRequest.js";
-import { endpoints } from "../api/endPoints.js";
+// src/context/AuthContext.jsx
+import { createContext, useContext, useEffect, useState } from "react";
+import axiosInstance from "../api/axiosInstance";
+import { endpoints } from "../api/endPoints";
+import { useLocation } from "react-router-dom";
+const publicPaths = ["/", "/register"];
 
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [user,           setUser]             = useState(null);
+  const [loading,        setLoading]          = useState(true);
+const location = useLocation()
+ 
 
   useEffect(() => {
-    const checkLogin = async () => {
-      const token = localStorage.getItem("token");
-
-      if (!token) {
-        setLoading(false);
-        return;
-      }
-
-      setAuthToken(token); 
-
+     if (publicPaths.includes(location.pathname)) {
+      setLoading(false);    
+      return;
+    }
+    (async () => {
       try {
-        const res = await apiRequest({
-          method: endpoints.checkLogin.method,
-          url: endpoints.checkLogin.url,
-        });
-
-        setIsAuthenticated(true);
-        setUser(res.user); 
-      } catch (err) {
-        console.error("Check login failed:", err.message);
-        localStorage.removeItem("token");
+        const res = await axiosInstance(endpoints.checkLogin);  
+        if (res.data.success) {
+          setIsAuthenticated(true);
+          setUser(res.data.data.user);
+        }
+        
+        
+      } catch {
         setIsAuthenticated(false);
         setUser(null);
       } finally {
         setLoading(false);
       }
-    };
-
-    checkLogin();
-  }, []);
+    })();
+  }, [location.pathname]);
 
   return (
     <AuthContext.Provider
-      value={{
-        isAuthenticated,
-        setIsAuthenticated,
-        user,
-        setUser,
-        loading,
-      }}
+      value={{ isAuthenticated, setIsAuthenticated, user, setUser, loading }}
     >
       {children}
     </AuthContext.Provider>

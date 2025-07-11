@@ -1,3 +1,4 @@
+// src/pages/GenerateQuiz.jsx
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { apiRequest } from "../../api/apiRequest";
@@ -6,11 +7,13 @@ import { toast } from "react-toastify";
 import { Loader2 } from "lucide-react";
 import Sidebar from "../../components/Sidebar";
 import { FiMenu } from "react-icons/fi";
+import { confirmToast } from "../../utils/confirmToast";     // ⬅️ new
 
 const GenerateQuiz = () => {
   const { noteId } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const calledRef = useRef(false);
@@ -19,21 +22,22 @@ const GenerateQuiz = () => {
     if (calledRef.current) return;
     calledRef.current = true;
 
-    let called = false;
     (async () => {
-      if (called) return;
-      called = true;
-
       try {
+        /* 1️⃣  Fetch note to see whether a quiz already exists */
         const { method, url } = endpoints.getNote(noteId);
         const note = await apiRequest({ method, url });
 
-        if (note?.quiz && note.quiz.length > 0) {
-          const userWantsNew = window.confirm(
-            "A quiz is already generated for this note. Do you want to generate a new quiz with different questions?"
-          );
+        if (note?.quiz?.length) {
+          /* 2️⃣  Ask user via toast-dialog instead of window.confirm */
+          const generateNew = await confirmToast({
+            title: "Quiz already exists",
+            message: "Generate a new quiz with different questions?",
+            confirmLabel: "Generate New",
+            cancelLabel: "Use Existing",
+          });
 
-          if (!userWantsNew) {
+          if (!generateNew) {
             localStorage.setItem(`quiz-${noteId}`, JSON.stringify(note.quiz));
             toast.info("Using previously generated quiz.");
             navigate(`/quizzes/${noteId}/attempt`, {
@@ -43,6 +47,7 @@ const GenerateQuiz = () => {
           }
         }
 
+        /* 3️⃣  Create a fresh quiz */
         const res = await apiRequest(endpoints.generateQuiz(noteId));
         localStorage.setItem(`quiz-${noteId}`, JSON.stringify(res));
         toast.success("New quiz generated!");
@@ -52,19 +57,17 @@ const GenerateQuiz = () => {
         setLoading(false);
       }
     })();
-  }, [noteId, navigate]);
+  }, [noteId, navigate, location]);
 
   return (
     <div className="flex bg-slate-900 min-h-screen text-white">
-      {/* Sidebar */}
-      <div className="fixed top-16 left-0 w-60 h-full z-50 bg-slate-900 border-r border-gray-800">
-        <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
-      </div>
+      {/* ───────── Sidebar ───────── */}
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      {/* Main Content */}
-      <main className="flex-1 ml-60 px-4 py-6 sm:px-10 sm:py-10 w-full">
-        <div className="max-w-5xl mx-auto">
-          {/* Mobile Top Bar */}
+      {/* ───────── Main ───────── */}
+      <main className="flex-1 w-full px-4 py-6 sm:px-10 sm:py-10 sm:ml-60">
+        <div className="mx-auto max-w-5xl">
+          {/* Mobile top bar */}
           <div className="sm:hidden flex justify-between items-center mb-6">
             <button onClick={() => setIsSidebarOpen(true)}>
               <FiMenu className="text-2xl text-white" />
@@ -72,7 +75,7 @@ const GenerateQuiz = () => {
             <h2 className="text-lg font-semibold">Generate Quiz</h2>
           </div>
 
-          {/* Loading / Error UI */}
+          {/* Loading or error */}
           <div className="grid h-[60vh] place-items-center">
             {loading ? (
               <div className="flex items-center gap-3 text-gray-300 text-lg">
@@ -80,7 +83,9 @@ const GenerateQuiz = () => {
                 Generating your quiz…
               </div>
             ) : (
-              <p className="text-red-400 text-lg">Failed to generate quiz. Please try again.</p>
+              <p className="text-red-400 text-lg">
+                Failed to generate quiz. Please try again.
+              </p>
             )}
           </div>
         </div>

@@ -1,104 +1,96 @@
+// src/pages/reminders/CreateReminderForm.jsx
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../api/apiRequest";
 import { endpoints } from "../../api/endPoints";
 import { toast } from "react-toastify";
+import { Loader2 } from "lucide-react";
 
 export default function CreateReminderForm({ onReminderCreated }) {
-  const [notes, setNotes] = useState([]);
+  const [notes, setNotes]   = useState([]);
   const [noteId, setNoteId] = useState("");
-  const [suggestedDate, setSuggestedDate] = useState("");
-  const [loadingNotes, setLoadingNotes] = useState(true);
+  const [date, setDate]     = useState("");
+  const [loading, setLoading] = useState(true);
 
-  /* ────────────────────────────────
-     1️⃣  Load all notes for dropdown
-  ───────────────────────────────────*/
+  /* ── Load user notes for dropdown ── */
   useEffect(() => {
     (async () => {
       try {
-        const res = await apiRequest({
-          method: endpoints.getNotes.method,
-          url: endpoints.getNotes.url,
-        });
-        setNotes(res?.data || res);
-      } catch (err) {
+        const res = await apiRequest(endpoints.getNotes);
+        setNotes( res);
+        console.log(res);
+        
+      } catch {
         toast.error("Failed to load notes");
-        console.error(err);
       } finally {
-        setLoadingNotes(false);
+        setLoading(false);
       }
     })();
   }, []);
 
-  /* ────────────────────────────────
-     2️⃣  Submit handler
-  ───────────────────────────────────*/
+  /* ── Submit ── */
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!noteId || !suggestedDate) {
-      return toast.error("Both note and date are required");
-    }
+    if (!noteId || !date) return toast.error("Both note and date are required");
 
     try {
-      const { method, url } = endpoints.reminders.create;
-      await apiRequest({ method, url, data: { noteId, suggestedDate } });
+      await apiRequest({
+        ...endpoints.reminders.create,
+        data: { noteId, suggestedDate: date },
+      });
       toast.success("Reminder created!");
-      onReminderCreated();           // refresh list in parent
+      onReminderCreated();
       setNoteId("");
-      setSuggestedDate("");
-    } catch (err) {
+      setDate("");
+    } catch {
       toast.error("Failed to create reminder");
-      console.error(err);
     }
   };
 
-  /* ────────────────────────────────
-     3️⃣  JSX
-  ───────────────────────────────────*/
   return (
     <form
       onSubmit={handleSubmit}
-      className="bg-gray-900 p-4 rounded shadow mb-6 text-white space-y-4"
+      className="bg-gray-800 rounded-2xl p-6 mb-8 space-y-5 ring-1 ring-white/10"
     >
-      <h2 className="text-xl font-semibold">Create New Reminder</h2>
+      <h2 className="text-lg font-semibold">Create New Reminder</h2>
 
       {/* Note selector */}
-      <div>
-        <label className="block text-sm mb-1">Select Note</label>
+      <div className="space-y-1">
+        <label className="text-sm">Select Note</label>
         <select
           value={noteId}
-          disabled={loadingNotes}
+          disabled={loading}
           onChange={(e) => setNoteId(e.target.value)}
-          className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          className="w-full rounded-lg bg-gray-700 px-3 py-2 focus:ring-2 focus:ring-blue-500"
         >
           <option value="" disabled>
-            {loadingNotes ? "Loading notes..." : "Choose a note"}
+            {loading ? "Loading notes…" : "Choose a note"}
           </option>
-          {notes.map((note) => (
-            <option key={note._id} value={note._id}>
-              {note.title} {note.subject ? `(${note.subject})` : ""}
+          {notes.map(({ _id, title, subject }) => (
+            <option key={_id} value={_id}>
+              {title} {subject && `(${subject})`}
             </option>
           ))}
         </select>
       </div>
 
       {/* Date picker */}
-      <div>
-        <label className="block text-sm mb-1">Suggested Date</label>
+      <div className="space-y-1">
+        <label className="text-sm">Suggested Date</label>
         <input
           type="date"
-          value={suggestedDate}
-          onChange={(e) => setSuggestedDate(e.target.value)}
-          className="w-full p-2 rounded bg-gray-800 border border-gray-700"
+          value={date}
+          onChange={(e) => setDate(e.target.value)}
+          className="w-full rounded-lg bg-gray-700 px-3 py-2 focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {/* Submit */}
       <button
         type="submit"
-        className="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded disabled:opacity-50"
-        disabled={loadingNotes}
+        disabled={loading}
+        className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-medium disabled:opacity-50 flex items-center justify-center gap-2"
       >
-        Create Reminder
+        {loading && <Loader2 className="w-4 h-4 animate-spin" />} Create Reminder
       </button>
     </form>
   );

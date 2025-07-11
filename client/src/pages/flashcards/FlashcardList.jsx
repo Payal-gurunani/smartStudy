@@ -1,22 +1,29 @@
+// src/pages/FlashcardList.jsx
 import { useEffect, useState, useCallback } from "react";
 import { debounce } from "lodash";
-import { apiRequest } from "../../api/apiRequest.js";
-import { endpoints } from "../../api/endPoints.js";
-import FlashcardCard from "../flashcards/Flashcard.jsx";
+import { apiRequest } from "../../api/apiRequest";
+import { endpoints } from "../../api/endPoints";
+import FlashcardCard from "../flashcards/Flashcard";
+import Sidebar from "../../components/Sidebar";
+import { FiMenu } from "react-icons/fi";
+import { Loader2 } from "lucide-react";
 
 const FlashcardList = () => {
+  /* ───────── State ───────── */
   const [flashcards, setFlashcards] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [filters, setFilters] = useState({ query: "", subject: "", tag: "" });
+  const [filters, setFilters] = useState({ query: "", subject: "" });
   const [manualSearch, setManualSearch] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
+  /* ───────── Fetch ───────── */
   const fetchFlashcards = async () => {
     try {
       setLoading(true);
 
       const queryParams = new URLSearchParams(
-        Object.entries(filters).reduce((acc, [key, val]) => {
-          if (val.trim()) acc[key] = val;
+        Object.entries(filters).reduce((acc, [k, v]) => {
+          if (v.trim()) acc[k] = v;
           return acc;
         }, {})
       ).toString();
@@ -27,8 +34,9 @@ const FlashcardList = () => {
       });
 
       setFlashcards(res);
-    } catch (error) {
-      console.error("Failed to fetch flashcards", error);
+    } catch (err) {
+      /* eslint-disable-next-line no-console */
+      console.error("Failed to fetch flashcards", err);
     } finally {
       setLoading(false);
     }
@@ -39,77 +47,113 @@ const FlashcardList = () => {
     setManualSearch(false);
   }, [filters]);
 
+  /* ───────── Debounce ───────── */
   const debouncedQuery = useCallback(
-    debounce((value) => {
-      setFilters((prev) => ({ ...prev, query: value }));
-    }, 500),
+    debounce((val) =>
+      setFilters((prev) => ({
+        ...prev,
+        query: val,
+      }))
+    , 500),
     []
   );
 
-  // Group flashcards by subject
-  const groupedBySubject = flashcards.reduce((acc, fc) => {
+  /* ───────── Group by subject ───────── */
+  const grouped = flashcards.reduce((acc, fc) => {
     const subject = fc.subject || "Uncategorized";
-    if (!acc[subject]) acc[subject] = [];
-    acc[subject].push(fc);
+    (acc[subject] = acc[subject] || []).push(fc);
     return acc;
   }, {});
 
+  /* ───────── JSX ───────── */
   return (
-    <div className="p-6  mx-auto bg-gray-950 min-h-screen">
-      <h2 className="text-2xl font-bold mb-6 text-white">Your Flashcards</h2>
+    <div className="flex bg-slate-900 min-h-screen text-white">
+      {/* Sidebar */}
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      {/* Filters */}
-      <div className="flex flex-wrap gap-4 mb-6">
-        <input
-          type="text"
-          placeholder="Search..."
-          className="flex-1 p-2 border border-gray-300 rounded text-white bg-gray-800 placeholder-gray-400"
-          defaultValue={filters.query}
-          onChange={(e) => debouncedQuery(e.target.value)}
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              fetchFlashcards();
-              setManualSearch(true);
-            }
-          }}
-        />
-
-        <input
-          type="text"
-          placeholder="Subject"
-          className="flex-1 p-2 border border-gray-300 rounded text-white bg-gray-800 placeholder-gray-400"
-          value={filters.subject}
-          onChange={(e) =>
-            setFilters((prev) => ({ ...prev, subject: e.target.value }))
-          }
-          onKeyDown={(e) => {
-            if (e.key === "Enter") {
-              fetchFlashcards();
-              setManualSearch(true);
-            }
-          }}
-        />
-      </div>
-
-      {/* Content */}
-      {loading ? (
-        <p className="text-center mt-10 text-white">Loading flashcards...</p>
-      ) : flashcards.length === 0 ? (
-        <p className="text-center mt-10 text-gray-400">No flashcards found.</p>
-      ) : (
-        Object.entries(groupedBySubject).map(([subject, cards]) => (
-          <div key={subject} className="mb-10">
-            <h3 className="text-xl font-semibold mb-4 text-orange-300">
-              📘 {subject}
-            </h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-              {cards.map((fc) => (
-                <FlashcardCard key={fc._id} flashcard={fc} />
-              ))}
-            </div>
+      {/* Main */}
+      <main className="flex-1 w-full px-4 py-6 sm:px-10 sm:py-10 sm:ml-60">
+        <div className="mx-auto max-w-6xl">
+          {/* Mobile Top Bar */}
+          <div className="sm:hidden flex justify-between items-center mb-6">
+            <button onClick={() => setIsSidebarOpen(true)}>
+              <FiMenu className="text-2xl text-white" />
+            </button>
+            <h2 className="text-lg font-semibold">Flashcards</h2>
           </div>
-        ))
-      )}
+
+          {/* Heading */}
+          <h2 className="hidden sm:block text-2xl font-bold mb-6">
+            Your Flashcards
+          </h2>
+
+          {/* Filters */}
+          <div className="flex flex-wrap gap-4 mb-8">
+            <input
+              type="text"
+              placeholder="Search…"
+              defaultValue={filters.query}
+              className="flex-1 min-w-[10rem] rounded-lg px-3 py-2
+                         bg-white/5 text-white placeholder-white/40
+                         focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) => debouncedQuery(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  fetchFlashcards();
+                  setManualSearch(true);
+                }
+              }}
+            />
+
+            <input
+              type="text"
+              placeholder="Subject"
+              value={filters.subject}
+              className="flex-1 min-w-[8rem] rounded-lg px-3 py-2
+                         bg-white/5 text-white placeholder-white/40
+                         focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={(e) =>
+                setFilters((p) => ({ ...p, subject: e.target.value }))
+              }
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  fetchFlashcards();
+                  setManualSearch(true);
+                }
+              }}
+            />
+          </div>
+
+          {/* Content */}
+          {loading ? (
+            <div className="grid h-[50vh] place-items-center">
+              <span className="flex items-center gap-2 text-white/80">
+                <Loader2 className="w-6 h-6 animate-spin" /> Loading flashcards…
+              </span>
+            </div>
+          ) : flashcards.length === 0 ? (
+            <div className="grid h-[50vh] place-items-center">
+              <p className="text-white/60 text-lg">
+                📇 No flashcards found.
+              </p>
+            </div>
+          ) : (
+            Object.entries(grouped).map(([subject, cards]) => (
+              <section key={subject} className="mb-12">
+                <h3 className="text-xl font-semibold mb-4 text-orange-300">
+                  📘 {subject}
+                </h3>
+
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {cards.map((fc) => (
+                    <FlashcardCard key={fc._id} flashcard={fc} />
+                  ))}
+                </div>
+              </section>
+            ))
+          )}
+        </div>
+      </main>
     </div>
   );
 };
