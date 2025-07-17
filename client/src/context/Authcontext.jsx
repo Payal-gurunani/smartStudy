@@ -1,19 +1,17 @@
-// src/context/AuthContext.jsx
+
 import { createContext, useContext, useEffect, useState } from "react";
 import axiosInstance from "../api/axiosInstance";
 import { endpoints } from "../api/endPoints";
 import { useLocation } from "react-router-dom";
-const publicPaths = ["/", "/register"];
-
+const publicPaths = ["/login", "/register"];
+import { useRef } from "react";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [user,           setUser]             = useState(null);
   const [loading,        setLoading]          = useState(true);
 const location = useLocation()
- 
-
   useEffect(() => {
      if (publicPaths.includes(location.pathname)) {
       setLoading(false);    
@@ -28,18 +26,23 @@ const location = useLocation()
         }
         
         
-      } catch {
-        setIsAuthenticated(false);
-        setUser(null);
-      } finally {
+      } catch (error) {
+  if (error.response && error.response.status === 401) {
+  } else {
+    console.error("Auth check error:", error);
+  }
+  setIsAuthenticated(false);
+  setUser(null);
+}
+finally {
         setLoading(false);
       }
     })();
-  }, [location.pathname]);
-
+  }, [ location.pathname]);
+if (loading) return null;
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, setIsAuthenticated, user, setUser, loading }}
+      value={{ isAuthenticated, setIsAuthenticated, user, setUser }}
     >
       {children}
     </AuthContext.Provider>

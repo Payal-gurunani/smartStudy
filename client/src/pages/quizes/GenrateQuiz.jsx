@@ -1,4 +1,3 @@
-// src/pages/GenerateQuiz.jsx
 import { useEffect, useState, useRef } from "react";
 import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { apiRequest } from "../../api/apiRequest";
@@ -24,12 +23,10 @@ const GenerateQuiz = () => {
 
     (async () => {
       try {
-        /* 1️⃣  Fetch note to see whether a quiz already exists */
         const { method, url } = endpoints.getNote(noteId);
         const note = await apiRequest({ method, url });
 
         if (note?.quiz?.length) {
-          /* 2️⃣  Ask user via toast-dialog instead of window.confirm */
           const generateNew = await confirmToast({
             title: "Quiz already exists",
             message: "Generate a new quiz with different questions?",
@@ -47,7 +44,6 @@ const GenerateQuiz = () => {
           }
         }
 
-        /* 3️⃣  Create a fresh quiz */
         const res = await apiRequest(endpoints.generateQuiz(noteId));
         localStorage.setItem(`quiz-${noteId}`, JSON.stringify(res));
         toast.success("New quiz generated!");
@@ -61,10 +57,8 @@ const GenerateQuiz = () => {
 
   return (
     <div className="flex bg-slate-900 min-h-screen text-white">
-      {/* ───────── Sidebar ───────── */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      {/* ───────── Main ───────── */}
       <main className="flex-1 w-full px-4 py-6 sm:px-10 sm:py-10 sm:ml-60">
         <div className="mx-auto max-w-5xl">
           {/* Mobile top bar */}

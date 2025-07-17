@@ -9,14 +9,12 @@ import { FiMenu } from "react-icons/fi";
 import { Loader2 } from "lucide-react";
 
 const FlashcardList = () => {
-  /* ───────── State ───────── */
   const [flashcards, setFlashcards] = useState([]);
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState({ query: "", subject: "" });
   const [manualSearch, setManualSearch] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  /* ───────── Fetch ───────── */
   const fetchFlashcards = async () => {
     try {
       setLoading(true);
@@ -35,7 +33,6 @@ const FlashcardList = () => {
 
       setFlashcards(res);
     } catch (err) {
-      /* eslint-disable-next-line no-console */
       console.error("Failed to fetch flashcards", err);
     } finally {
       setLoading(false);
@@ -47,7 +44,6 @@ const FlashcardList = () => {
     setManualSearch(false);
   }, [filters]);
 
-  /* ───────── Debounce ───────── */
   const debouncedQuery = useCallback(
     debounce((val) =>
       setFilters((prev) => ({
@@ -58,14 +54,12 @@ const FlashcardList = () => {
     []
   );
 
-  /* ───────── Group by subject ───────── */
   const grouped = flashcards.reduce((acc, fc) => {
     const subject = fc.subject || "Uncategorized";
     (acc[subject] = acc[subject] || []).push(fc);
     return acc;
   }, {});
 
-  /* ───────── JSX ───────── */
   return (
     <div className="flex bg-slate-900 min-h-screen text-white">
       {/* Sidebar */}

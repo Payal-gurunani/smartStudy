@@ -108,7 +108,6 @@ export default function UploadPdfNote() {
             )}
           </div>
 
-          {/* Upload Progress */}
           {uploadProgress > 0 && (
             <div className="mt-6">
               <label className="text-sm font-medium text-gray-300">Upload Progress</label>
@@ -122,7 +121,6 @@ export default function UploadPdfNote() {
             </div>
           )}
 
-          {/* Subject Dropdown */}
           <div className="mt-6">
             <label className="block mb-1 text-sm font-medium text-gray-300">Select Subject</label>
             <select
@@ -139,7 +137,6 @@ export default function UploadPdfNote() {
             </select>
           </div>
 
-          {/* Custom Subject Input */}
           {subject === "Other" && (
             <div className="mt-4">
               <label className="block mb-1 text-sm font-medium text-gray-300">Enter Custom Subject</label>

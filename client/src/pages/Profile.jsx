@@ -7,6 +7,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/Authcontext";
 import Sidebar from "../components/Sidebar";
 import { Loader2 } from "lucide-react";
+import { replace } from "lodash";
 
 export default function Profile() {
   const [profile, setProfile]       = useState(null);
@@ -14,29 +15,30 @@ export default function Profile() {
   const [progress, setProgress]     = useState(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const navigate = useNavigate();
-  const { setIsAuthenticated } = useAuth();
+  const { setIsAuthenticated ,setUser } = useAuth();
 
-  /* ───────── Logout ───────── */
   const handleLogout = async () => {
     try {
       await apiRequest(endpoints.logout);
+     
     } catch (err) {
       console.error("Logout error:", err);
     } finally {
      
       setIsAuthenticated(false);
-      navigate("/");
+      setUser(null)
+      navigate("/",{replace : true});
     }
   };
 
-  /* ───────── Fetch profile / stats ───────── */
   useEffect(() => {
     (async () => {
       try {
         const profileRes  = await apiRequest(endpoints.Profile);
         const notesRes    = await apiRequest(endpoints.getNotes);
-        const progressRes = await apiRequest({ method: "GET", url: "/progress" });
-
+        const progressRes = await apiRequest(endpoints.progress);
+        // console.log(profileRes);
+        
         setProfile(profileRes);
         setNotesCount(notesRes.length || 0);
         setProgress(progressRes);
@@ -46,7 +48,6 @@ export default function Profile() {
     })();
   }, []);
 
-  /* ───────── Loader ───────── */
   if (!profile || !progress) {
     return (
       <div className="grid min-h-screen place-items-center bg-slate-900 text-white">
@@ -57,10 +58,10 @@ export default function Profile() {
       </div>
     );
   }
+console.log(progress);
 
   const joinedYear = new Date(profile.createdAt).getFullYear();
 
-  /* ───────── JSX ───────── */
   return (
     <div className="flex bg-slate-900 min-h-screen text-white">
       {/* Sidebar */}
@@ -74,7 +75,6 @@ export default function Profile() {
             <button onClick={() => setSidebarOpen(true)}>
               <FiMenu className="text-2xl" />
             </button>
-            <h1 className="text-lg font-semibold">Profile</h1>
           </div>
 
           {/* Profile Card */}
@@ -111,9 +111,9 @@ export default function Profile() {
 
               <button
                 onClick={handleLogout}
-                className="w-full flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 py-2 rounded-lg font-semibold mt-4"
+                className="w-full cursor-pointer flex items-center justify-center gap-2 bg-red-600 hover:bg-red-700 py-2 rounded-lg font-semibold mt-4"
               >
-                <FiLogOut className="text-lg" />
+                <FiLogOut className="text-lg " />
                 Logout
               </button>
             </div>
@@ -124,7 +124,6 @@ export default function Profile() {
   );
 }
 
-/* ───────── Small stat card ───────── */
 function Card({ title, value }) {
   return (
     <div className="bg-white/5 hover:bg-white/10 rounded-lg p-4 text-center ring-1 ring-white/10">

@@ -39,7 +39,7 @@ export default function Sidebar({ isOpen, onClose }) {
 
         {/* Navigation Items */}
         <nav className="space-y-2 px-4">
-          <NavLink to="/home" className={navItemClass}>
+          <NavLink to="/" className={navItemClass}>
             <FiHome /> Home
           </NavLink>
           <NavLink to="/notes/view" className={navItemClass}>

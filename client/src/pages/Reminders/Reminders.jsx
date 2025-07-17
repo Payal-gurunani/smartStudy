@@ -1,4 +1,3 @@
-// src/pages/reminders/Reminders.jsx
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../api/apiRequest";
 import { endpoints } from "../../api/endPoints";
@@ -13,14 +12,12 @@ export default function Reminders() {
   const [loading, setLoading]     = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
-  /* ── Fetch all reminders ── */
   const fetchReminders = async () => {
     try {
       setLoading(true);
       const data = await apiRequest(endpoints.reminders.getAll);
       setReminders(data);
     } catch {
-      /* eslint-disable-next-line no-console */
       console.error("Failed to fetch reminders");
     } finally {
       setLoading(false);
@@ -29,7 +26,6 @@ export default function Reminders() {
 
   useEffect(() => { fetchReminders(); }, []);
 
-  /* ── Status change ── */
   const handleStatusChange = async (id, status) => {
     try {
       await apiRequest({ ...endpoints.reminders.updateStatus(id), data: { status } });
@@ -37,7 +33,6 @@ export default function Reminders() {
     } catch { console.error("Failed to update status"); }
   };
 
-  /* ── Delete with confirmation ── */
   const handleDelete = async (id) => {
     const ok = await confirmToast({
       title: "Delete reminder?",
@@ -53,13 +48,10 @@ export default function Reminders() {
     } catch { console.error("Failed to delete"); }
   };
 
-  /* ── JSX ── */
   return (
     <div className="flex bg-slate-900 min-h-screen text-white">
-      {/* Sidebar */}
       <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
 
-      {/* Main */}
       <main className="flex-1 w-full px-4 py-6 sm:px-10 sm:py-10 sm:ml-60">
         <div className="mx-auto max-w-3xl">
           {/* Mobile bar */}

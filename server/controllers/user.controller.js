@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { generateToken } from "../utils/genratetoken.js";
-
+import jwt from "jsonwebtoken";
 const Register = asyncHandler(async(req,res)=>{
 const {username , email, password} = req.body;
 if([username ,email ,password ].some((field)=>field?.trim() ==="")){
@@ -56,6 +56,7 @@ const passwordMatch = await user.matchPassword(password);
  
  const tokenOptions = {
   httpOnly: true,
+  // secure: true,
   secure: process.env.NODE_ENV === "production",
   sameSite: "strict", // prevents CSRF
   maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
@@ -85,7 +86,6 @@ res.clearCookie("token", {
 return res.status(200).json(new ApiResponse(200, {}, "Logged out"));
 });
 
-// controllers/userController.js
 const checkLogin = asyncHandler(async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: "Not authenticated" });
@@ -94,10 +94,9 @@ const checkLogin = asyncHandler(async (req, res) => {
   res.status(200).json({
     success: true,
     message: "Authenticated",
-    data: { user: req.user }, // or just a minimal set like name/email
+    data: { user: req.user }, 
   });
 });
-
 
 const getProfile = asyncHandler(async (req, res) => {
   const user = await User.findById(req.user.id).select("-password");

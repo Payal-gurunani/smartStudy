@@ -29,8 +29,9 @@ function App() {
       <ToastContainer position="top-right" autoClose={3000} />
       <Routes location={location} key={location.pathname}>
         <Route path="/" element={<Layout />}>
-          <Route path="/home" element={<Home />} />
-          <Route index element={<Login />} />
+          
+          <Route index element={<Home />} />
+          <Route path="/login" element ={<Login />} />
           <Route path="register" element={<Register />} />
 
           <Route

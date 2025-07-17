@@ -16,16 +16,14 @@ export default function Register() {
     password: "",
   });
 
-  const [errors, setErrors]       = useState({});   // field errors
-  const [generalError, setGenErr] = useState("");   // banner error
+  const [errors, setErrors]       = useState({});   
+  const [generalError, setGenErr] = useState("");   
   const [submitting, setSubmitting] = useState(false);
 
-  /* go home if already logged-in */
   useEffect(() => {
     if (isAuthenticated) navigate("/home", { replace: true });
   }, [isAuthenticated]);
 
-  /* handle change */
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((p) => ({ ...p, [name]: value }));
@@ -33,7 +31,6 @@ export default function Register() {
     setGenErr("");
   };
 
-  /* submit */
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSubmitting(true);
@@ -77,7 +74,6 @@ if (data?.fieldErrors) setErrors(data.fieldErrors);
           Create account
         </h2>
 
-        {/* general error banner */}
         {generalError && (
           <div className="bg-red-600/20 text-red-400 text-sm rounded-lg p-3 mb-4">
             {generalError}
@@ -129,8 +125,7 @@ if (data?.fieldErrors) setErrors(data.fieldErrors);
           </button>
         </form>
 
-        {/* social + footer (unchanged) */}
-        {/* … */}
+       
         <div className="flex items-center my-6">
           <div className="flex-grow h-px bg-white/10"></div>
           <span className="mx-3 text-gray-400 text-sm">Or continue with</span>

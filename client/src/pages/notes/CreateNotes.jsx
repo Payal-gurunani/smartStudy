@@ -24,10 +24,10 @@ export default function CreateNote() {
         url: endpoints.createNote.url,
         data: { ...note, tags: note.tags.split(",").map((t) => t.trim()) },
       });
-      toast.success("✅ Note created successfully");
+      toast.success(" Note created successfully");
       navigate("/notes/view");
     } catch {
-      toast.error("❌ Failed to create note");
+      toast.error(" Failed to create note");
     }
   };
 

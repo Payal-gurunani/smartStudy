@@ -1,4 +1,3 @@
-// src/pages/reminders/CreateReminderForm.jsx
 import { useEffect, useState } from "react";
 import { apiRequest } from "../../api/apiRequest";
 import { endpoints } from "../../api/endPoints";
@@ -11,7 +10,6 @@ export default function CreateReminderForm({ onReminderCreated }) {
   const [date, setDate]     = useState("");
   const [loading, setLoading] = useState(true);
 
-  /* ── Load user notes for dropdown ── */
   useEffect(() => {
     (async () => {
       try {
@@ -27,7 +25,6 @@ export default function CreateReminderForm({ onReminderCreated }) {
     })();
   }, []);
 
-  /* ── Submit ── */
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!noteId || !date) return toast.error("Both note and date are required");
@@ -53,7 +50,6 @@ export default function CreateReminderForm({ onReminderCreated }) {
     >
       <h2 className="text-lg font-semibold">Create New Reminder</h2>
 
-      {/* Note selector */}
       <div className="space-y-1">
         <label className="text-sm">Select Note</label>
         <select
@@ -88,7 +84,7 @@ export default function CreateReminderForm({ onReminderCreated }) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full bg-blue-600 hover:bg-blue-700 py-2 rounded-lg font-medium disabled:opacity-50 flex items-center justify-center gap-2"
+        className="w-full bg-blue-600 cursor-pointer hover:bg-blue-700 py-2 rounded-lg font-medium disabled:opacity-50 flex items-center justify-center gap-2"
       >
         {loading && <Loader2 className="w-4 h-4 animate-spin" />} Create Reminder
       </button>

@@ -23,7 +23,7 @@ export default function GuestHome() {
             Get Started
           </Link>
           <Link
-            to="/"
+            to="/login"
             className="border border-white/20 hover:bg-white/10 px-6 py-2 rounded-lg text-white font-medium cursor-pointer"
           >
             Login

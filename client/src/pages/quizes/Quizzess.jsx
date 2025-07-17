@@ -47,8 +47,8 @@ const navigate = useNavigate()
           {/* Header */}
           <div className="flex justify-between items-center mb-8 flex-wrap gap-3">
             <h2 className="text-3xl font-bold">Quizzes</h2>
-            <Link to="">
-              <button className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg font-semibold text-white">
+            <Link to="/quizzes/results">
+              <button className="bg-emerald-600 cursor-pointer hover:bg-emerald-700 px-4 py-2 rounded-lg font-semibold text-white">
                 Quiz Results
               </button>
             </Link>
@@ -86,7 +86,7 @@ const navigate = useNavigate()
                   )}
                 <div className="mt-3 flex flex-wrap gap-3">
   <button
-    className="bg-emerald-600 hover:bg-emerald-700 px-4 py-1.5 rounded text-sm font-semibold"
+    className="bg-emerald-600 cursor-pointer hover:bg-emerald-700 px-4 py-1.5 rounded text-sm font-semibold"
     onClick={async () => {
       try {
         const { method, url } = endpoints.getNote(q.noteId);
@@ -107,18 +107,14 @@ const navigate = useNavigate()
     {q.attempted ? "Retake Quiz" : "Start Quiz"}
   </button>
 
-  {/* 👇 View Result button only if attempted */}
   {q.attempted && q.resultId && (
     <Link to={`/quizzes/result/${q.resultId}`}>
-      <button className="bg-gray-700 hover:bg-gray-600 px-4 py-1.5 rounded text-sm">
+      <button className="bg-gray-700 cursor-pointer hover:bg-gray-600 px-4 py-1.5 rounded text-sm">
         View Result
       </button>
     </Link>
   )}
 </div>
-
-                
-
                 </div>
               </div>
             ))}

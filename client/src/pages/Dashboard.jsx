@@ -49,7 +49,6 @@ export default function Dashboard() {
     <div className="relative flex min-h-screen bg-slate-900 overflow-x-auto text-white">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
 
-      {/* Mobile Sidebar Toggle */}
       <button
         className="sm:hidden fixed top-4 left-4 z-50 bg-slate-800 p-2 rounded-md shadow-md"
         onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -91,7 +90,6 @@ export default function Dashboard() {
             </div>
           </section>
 
-          {/* Quiz Table */}
           <section className="mb-10">
             <h2 className="text-xl font-semibold mb-4">Upcoming Quizzes</h2>
             <div className="overflow-x-auto rounded-lg">

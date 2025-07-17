@@ -13,7 +13,8 @@ export const getUserProgress = asyncHandler(async (req, res) => {
   const totalQuizzes = quizResults.length;
   const totalScore = quizResults.reduce((sum, q) => sum + (q.score || 0), 0);
   const maxScore = quizResults.reduce((sum, q) => sum + (q.questions?.length || 0), 0);
-  const avgScore = maxScore > 0 ? (totalScore / maxScore) * 100 : 0;
+  const avgScore = maxScore > 0 ? (totalScore / totalQuizzes) : 0;
+
 
   // 2. Study Reminders
   const reminders = await StudySchedule.find({ user: userId });

@@ -66,7 +66,7 @@ const QuizAttemptPage = () => {
       localStorage.removeItem(`quiz-${noteId}`);
       navigate("/quizzes/results");
     } catch (err) {
-      toast.error("Submission failed ❌");
+      toast.error("Submission failed ");
       console.error(err);
     }
   };
@@ -75,7 +75,7 @@ const QuizAttemptPage = () => {
   if (!quiz || quiz.length === 0) return <p className="text-center text-red-500">Quiz not available.</p>;
 
   const q = quiz[current];
-  console.log(quiz);
+  
 
   const selected = answers[current];
   const percent = ((current + 1) / quiz.length) * 100;
@@ -97,7 +97,7 @@ const QuizAttemptPage = () => {
                   navigate("/quizzes");
                 }
               }}
-              className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded"
+              className="bg-red-600 hover:bg-red-700 text-white font-semibold py-2 px-6 rounded cursor-pointer"
             >
               End Test
             </button>
@@ -108,7 +108,7 @@ const QuizAttemptPage = () => {
             Question {current + 1} of {quiz.length}
           </p>
 
-          {/* Progress Bar */}
+      
           <div className="w-full h-2 bg-slate-700 rounded-full mb-6 overflow-hidden">
             <div
               className="h-2 bg-blue-500 rounded-full transition-all"
@@ -146,7 +146,7 @@ const QuizAttemptPage = () => {
             <button
               disabled={current === 0}
               onClick={() => setCurrent((prev) => prev - 1)}
-              className="bg-slate-600 hover:bg-slate-500 text-white font-medium py-2 px-4 rounded disabled:opacity-50"
+              className="bg-slate-600 hover:bg-slate-500 cursor-pointer text-white font-medium py-2 px-4 rounded disabled:opacity-50"
             >
               Previous
             </button>
@@ -154,14 +154,14 @@ const QuizAttemptPage = () => {
             {current === quiz.length - 1 ? (
               <button
                 onClick={handleSubmit}
-                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded"
+                className="bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded cursor-pointer"
               >
                 Submit
               </button>
             ) : (
               <button
                 onClick={() => setCurrent((prev) => prev + 1)}
-                className="bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-6 rounded"
+                className="bg-blue-600 hover:bg-blue-700 cursor-pointer text-white font-medium py-2 px-6 rounded"
               >
                 Next
               </button>

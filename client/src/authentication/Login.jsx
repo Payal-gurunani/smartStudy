@@ -59,7 +59,7 @@ const [loginError, setLoginError] = useState("");
     setUser(res.user || res.data.user);
     setIsAuthenticated(true);
     toast.success("Login successful! Welcome back!");
-    navigate("/home");
+    navigate("/dashboard");
   } catch (error) {
     const backendMessage =
       error.message || "Login failed. Please try again.";
@@ -70,7 +70,7 @@ const [loginError, setLoginError] = useState("");
 };
   useEffect(() => {
     if (isAuthenticated) {
-      navigate("/home", { replace: true }); 
+      navigate("/dashboard", { replace: true }); 
     }
   }, [isAuthenticated]);
 
@@ -125,7 +125,7 @@ const [loginError, setLoginError] = useState("");
           <motion.div variants={childVariants}>
             <button
               type="submit"
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-semibold rounded-lg transform transition hover:scale-[1.02] duration-200"
+              className="w-full py-3 bg-blue-600 cursor-pointer hover:bg-blue-700 text-white font-semibold rounded-lg transform transition hover:scale-[1.02] duration-200"
             >
               Sign In
             </button>
@@ -134,10 +134,10 @@ const [loginError, setLoginError] = useState("");
 
         <motion.p
           variants={childVariants}
-          className="mt-6 text-center text-sm text-slate-400"
+          className="mt-6 text-center text-sm  text-slate-400"
         >
           Don’t have an account?{" "}
-          <Link to="/register" className="text-blue-400 hover:underline">
+          <Link to="/register" className="text-blue-400 cursor-pointer hover:underline">
             Register
           </Link>
         </motion.p>

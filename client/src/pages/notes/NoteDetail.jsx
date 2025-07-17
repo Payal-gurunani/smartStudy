@@ -68,10 +68,10 @@ const handleDelete = async () => {
   try {
     const { method, url } = endpoints.deleteNote(id);
     await apiRequest({ method, url });
-    toast.success("✅ Note deleted");
+    toast.success(" Note deleted");
     navigate("/notes/view");
   } catch (error) {
-    toast.error("❌ Failed to delete");
+    toast.error(" Failed to delete");
   }
 };
   if (!note) return <div className="text-white p-8">Loading note...</div>;

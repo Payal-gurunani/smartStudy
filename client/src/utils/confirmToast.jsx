@@ -1,6 +1,5 @@
-// utils/confirmToast.js
 import { toast } from "react-toastify";
-import React from "react";
+
 
 export function confirmToast({
   title = "Delete this note?",
