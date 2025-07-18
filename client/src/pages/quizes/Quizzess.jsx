@@ -10,7 +10,7 @@ const Quizzess = () => {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-const navigate = useNavigate()
+  const navigate = useNavigate()
   useEffect(() => {
     (async () => {
       try {
@@ -28,7 +28,19 @@ const navigate = useNavigate()
   }, []);
 
   if (loading) return <p className="text-center text-white mt-10">Loading quizzes...</p>;
-  if (quizzes.length === 0) return <p className="text-center mt-10 text-gray-400">No quizzes available.</p>;
+  if (quizzes.length === 0)
+    {
+      return ( 
+         <div className="flex flex-col items-center justify-center min-h-screen bg-gray-900 text-white space-y-4">
+  <p>No quizzes available. Please generate a quiz first.</p>
+  <Link to="/notes/view">
+    <button className="bg-emerald-600 hover:bg-emerald-700 px-4 py-2 rounded-lg font-semibold">
+      Go to Notes
+    </button>
+  </Link>
+</div>
+      )
+    } 
 
   return (
     <div className="flex min-h-screen bg-gray-900 text-white">
@@ -84,37 +96,37 @@ const navigate = useNavigate()
                       </p>
                     </>
                   )}
-                <div className="mt-3 flex flex-wrap gap-3">
-  <button
-    className="bg-emerald-600 cursor-pointer hover:bg-emerald-700 px-4 py-1.5 rounded text-sm font-semibold"
-    onClick={async () => {
-      try {
-        const { method, url } = endpoints.getNote(q.noteId);
-        const res = await apiRequest({ method, url });
+                  <div className="mt-3 flex flex-wrap gap-3">
+                    <button
+                      className="bg-emerald-600 cursor-pointer hover:bg-emerald-700 px-4 py-1.5 rounded text-sm font-semibold"
+                      onClick={async () => {
+                        try {
+                          const { method, url } = endpoints.getNote(q.noteId);
+                          const res = await apiRequest({ method, url });
 
-        if (res.quiz && res.quiz.length > 0) {
-          navigate(`/quizzes/${q.noteId}/attempt`);
-        } else {
-          toast.info("No quiz found. Redirecting to Generate Quiz page.");
-          navigate(`/notes/${q.noteId}/quiz/generate`);
-        }
-      } catch (err) {
-        toast.error("Error checking quiz availability");
-        console.error(err);
-      }
-    }}
-  >
-    {q.attempted ? "Retake Quiz" : "Start Quiz"}
-  </button>
+                          if (res.quiz && res.quiz.length > 0) {
+                            navigate(`/quizzes/${q.noteId}/attempt`);
+                          } else {
+                            toast.info("No quiz found. Redirecting to Generate Quiz page.");
+                            navigate(`/notes/${q.noteId}/quiz/generate`);
+                          }
+                        } catch (err) {
+                          toast.error("Error checking quiz availability");
+                          console.error(err);
+                        }
+                      }}
+                    >
+                      {q.attempted ? "Retake Quiz" : "Start Quiz"}
+                    </button>
 
-  {q.attempted && q.resultId && (
-    <Link to={`/quizzes/result/${q.resultId}`}>
-      <button className="bg-gray-700 cursor-pointer hover:bg-gray-600 px-4 py-1.5 rounded text-sm">
-        View Result
-      </button>
-    </Link>
-  )}
-</div>
+                    {q.attempted && q.resultId && (
+                      <Link to={`/quizzes/result/${q.resultId}`}>
+                        <button className="bg-gray-700 cursor-pointer hover:bg-gray-600 px-4 py-1.5 rounded text-sm">
+                          View Result
+                        </button>
+                      </Link>
+                    )}
+                  </div>
                 </div>
               </div>
             ))}

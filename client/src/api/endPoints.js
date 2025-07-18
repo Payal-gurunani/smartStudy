@@ -7,7 +7,6 @@ export const endpoints = {
   logout: { method: "POST", url: "/users/logout" },
   Profile : { method: "GET", url: "/users/profile" },
   checkLogin: { method: "GET", url: "/users/check-login" },
-
   // Notes
  getNotes: { method: "GET", url: "/notes" },
   createNote: { method: "POST", url: "/notes" },

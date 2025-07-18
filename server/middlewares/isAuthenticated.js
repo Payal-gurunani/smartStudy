@@ -1,6 +1,6 @@
 import jwt from 'jsonwebtoken';
 import { User } from '../models/user.model.js';
-
+import { Session } from '../models/Session.model.js';
 export const isAuthenticated = async (req, res, next) => {
   try {
    
@@ -9,12 +9,26 @@ export const isAuthenticated = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({ message: "Unauthorized, token missing" });
     }
+    const existingSession = await Session.findOne({ token }).populate("userId");
 
-   
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+  if (!existingSession) {
+    return res.status(401).json({ message: "Unauthorized, invalid token " });
+  }
 
+  const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    if (!decoded || !decoded.id ) {
+      return res.status(401).json({ message: "Unauthorized, invalid token decoded" });
+    }
+
+    // Check if session exists
+
+const session = await Session.findOne({ userId: decoded.id, token });
+    if (!session) {
+      return res.status(403).json({ message: "Token is invalid or revoked" });
+    }
+    
+req.user = existingSession.userId
    
-    req.user = await User.findById(decoded.id).select("-password");
 
     if (!req.user) {
       return res.status(401).json({ message: "Unauthorized, user not found" });

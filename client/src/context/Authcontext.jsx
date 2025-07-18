@@ -4,7 +4,6 @@ import axiosInstance from "../api/axiosInstance";
 import { endpoints } from "../api/endPoints";
 import { useLocation } from "react-router-dom";
 const publicPaths = ["/login", "/register"];
-import { useRef } from "react";
 const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
@@ -27,7 +26,10 @@ const location = useLocation()
         
         
       } catch (error) {
-  if (error.response && error.response.status === 401) {
+  if (error.response && error.response.status === 401 || error.response.status === 403) {
+    setIsAuthenticated(false);
+  setUser(null);
+
   } else {
     console.error("Auth check error:", error);
   }

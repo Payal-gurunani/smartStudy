@@ -15,7 +15,6 @@ export default function CreateReminderForm({ onReminderCreated }) {
       try {
         const res = await apiRequest(endpoints.getNotes);
         setNotes( res);
-        console.log(res);
         
       } catch {
         toast.error("Failed to load notes");

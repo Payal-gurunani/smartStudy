@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { useAuth } from "../context/Authcontext";
-import { FaUser, FaEnvelope, FaLock, FaGoogle, FaGithub, FaTwitter } from "react-icons/fa";
+import { FaUser, FaEnvelope, FaLock } from "react-icons/fa";
 import { apiRequest } from "../api/apiRequest";
 import { endpoints } from "../api/endPoints";
 
@@ -21,7 +21,7 @@ export default function Register() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
-    if (isAuthenticated) navigate("/home", { replace: true });
+    if (isAuthenticated) navigate("/", { replace: true });
   }, [isAuthenticated]);
 
   const handleChange = (e) => {
@@ -119,24 +119,11 @@ if (data?.fieldErrors) setErrors(data.fieldErrors);
             type="submit"
             disabled={submitting}
             className="w-full py-3 text-white font-semibold bg-gradient-to-r from-sky-500 to-blue-600 rounded-lg
-                       hover:from-sky-600 hover:to-blue-700 transition disabled:opacity-50 cursor-pointer"
+             hover:from-sky-600 hover:to-blue-700 transition disabled:opacity-50 cursor-pointer"
           >
             {submitting ? "Creating…" : "Create account"}
           </button>
         </form>
-
-       
-        <div className="flex items-center my-6">
-          <div className="flex-grow h-px bg-white/10"></div>
-          <span className="mx-3 text-gray-400 text-sm">Or continue with</span>
-          <div className="flex-grow h-px bg-white/10"></div>
-        </div>
-
-        <div className="flex justify-between">
-          <SocialBtn href="/auth/google" icon={<FaGoogle className="text-red-400" />} />
-          <SocialBtn href="/auth/github" icon={<FaGithub />} />
-          <SocialBtn href="/auth/twitter" icon={<FaTwitter className="text-sky-400" />} />
-        </div>
 
         <p className="mt-6 text-center text-sm text-gray-400">
           Already have an account?{" "}
@@ -149,7 +136,6 @@ if (data?.fieldErrors) setErrors(data.fieldErrors);
   );
 }
 
-/* —— small helpers ——————————————————— */
 
 function Input({ icon: Icon, error, ...rest }) {
   return (

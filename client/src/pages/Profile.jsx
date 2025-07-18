@@ -58,7 +58,6 @@ export default function Profile() {
       </div>
     );
   }
-console.log(progress);
 
   const joinedYear = new Date(profile.createdAt).getFullYear();
 

@@ -3,7 +3,7 @@ import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
 import { User } from "../models/user.model.js";
 import { generateToken } from "../utils/genratetoken.js";
-import jwt from "jsonwebtoken";
+import { Session } from "../models/Session.model.js";
 const Register = asyncHandler(async(req,res)=>{
 const {username , email, password} = req.body;
 if([username ,email ,password ].some((field)=>field?.trim() ==="")){
@@ -39,58 +39,57 @@ if(!createduser){
 )
 })
 
-const loginUser = asyncHandler(async (req,res)=>{
-const {email , password} = req.body;
-if (!email || !password) {
-    throw new ApiError(400, "Email and Password is required")
+const loginUser = asyncHandler(async (req, res) => {
+  const { email, password } = req.body;
+  const user = await User.findOne({ email });
+
+  if (!user || !(await user.matchPassword(password))) {
+    return res.status(401).json({ success: false, message: "Invalid credentials" });
   }
 
-  const user = await User.findOne({email});
-  if(!user) throw new ApiError(400,"User not found")
-const passwordMatch = await user.matchPassword(password);
-  if(!passwordMatch){
-    throw new ApiError(401,"Invalid password")
-  }
+  await Session.deleteMany({ userId: user._id });
 
-  const userLogin  = await User.findById(user._id).select("-password")
- 
- const tokenOptions = {
-  httpOnly: true,
-  // secure: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict", // prevents CSRF
-  maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
-};
-   const token =  generateToken(user);
-  if(!token){
-    throw new ApiError(500,"Token generation failed")
-  }
-  
-  return res
-  .status(200)
-   .cookie("token", token, tokenOptions)
-  .json(
-    new ApiResponse(200,{
-        user:userLogin,
-    },"Successfully login")
-  )
+  const token = generateToken(user);
 
-})
+  await Session.create({ userId: user._id, token });
+
+  res.cookie("token", token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "Lax",
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Login successful",
+    data: { user },
+  });
+});
+
+
 
 const logoutUser = asyncHandler(async (req, res) => {
-res.clearCookie("token", {
-  httpOnly: true,
-  secure: process.env.NODE_ENV === "production",
-  sameSite: "strict"
+  const token = req.cookies?.token || req.headers.authorization?.split(" ")[1];
+
+  if (token) {
+    await Session.deleteOne({ token });
+  }
+
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "strict",
+  });
+
+  return res.status(200).json(new ApiResponse(200, {}, "Logged out"));
 });
-return res.status(200).json(new ApiResponse(200, {}, "Logged out"));
-});
+
 
 const checkLogin = asyncHandler(async (req, res) => {
   if (!req.user) {
     return res.status(401).json({ success: false, message: "Not authenticated" });
   }
-
   res.status(200).json({
     success: true,
     message: "Authenticated",

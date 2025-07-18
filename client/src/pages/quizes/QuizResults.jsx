@@ -72,7 +72,6 @@ const QuizResults = () => {
             <button onClick={() => setIsSidebarOpen(true)}>
               <FiMenu className="text-2xl text-white" />
             </button>
-            <h2 className="text-lg font-semibold">Quiz Results</h2>
           </div>
 
           <h2 className="text-3xl font-bold mb-8">My Quiz Results</h2>

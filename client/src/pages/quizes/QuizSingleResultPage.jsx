@@ -32,7 +32,6 @@ const QuizSingleResultPage = () => {
   const totalQuestions = quiz.questions.length;
   const correctAnswers = quiz.questions.filter(q => q.selectedAnswer === q.correctAnswer).length;
   const accuracy = `${correctAnswers}/${totalQuestions}`;
-  const timeTaken = quiz.timeTaken || "--";
 
   return (
     <div className="flex bg-slate-900 min-h-screen text-white">
@@ -44,7 +43,6 @@ const QuizSingleResultPage = () => {
                   <button onClick={() => setIsSidebarOpen(true)}>
                     <FiMenu className="text-2xl text-white" />
                   </button>
-                  <h2 className="text-lg font-semibold">Upload PDF</h2>
                 </div>
         <div className="max-w-5xl mx-auto">
           <motion.div
