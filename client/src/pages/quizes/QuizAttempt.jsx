@@ -4,7 +4,7 @@ import { apiRequest } from "../../api/apiRequest";
 import { endpoints } from "../../api/endPoints";
 import { toast } from "react-toastify";
 import { motion } from "framer-motion";
-
+import { confirmToast } from "../../utils/confirmToast"; // ⬅️ new
 const QuizAttemptPage = () => {
   const { noteId } = useParams();
   const navigate = useNavigate();
@@ -90,8 +90,14 @@ const QuizAttemptPage = () => {
         >
           <div className="mt-6 text-center">
             <button
-              onClick={() => {
-                const confirmExit = window.confirm("Are you sure you want to end the test without submitting?");
+              onClick={async () => {
+                const confirmExit =  await confirmToast({
+                  title: "Exit Quiz",
+                  message: "Are you sure you want to end the test? Your progress will be lost.",
+                  confirmLabel: "Yes, End Test",  
+                  cancelLabel: "No, Continue",
+                });
+
                 if (confirmExit) {
                   localStorage.removeItem(`quiz-${noteId}`);
                   navigate("/quizzes");
