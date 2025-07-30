@@ -49,14 +49,12 @@ const Quizzess = () => {
       <main className="flex-1 sm:ml-60 px-4 py-6 sm:px-8 sm:py-10 w-full">
         <div className="max-w-6xl mx-auto">
 
-          {/* Mobile Top Bar */}
           <div className="sm:hidden flex justify-between items-center mb-6">
             <button onClick={() => setIsSidebarOpen(true)}>
               <FiMenu className="text-2xl text-white" />
             </button>
           </div>
 
-          {/* Header */}
           <div className="flex justify-between items-center mb-8 flex-wrap gap-3">
             <h2 className="text-3xl font-bold">Quizzes</h2>
             <Link to="/quizzes/results">
@@ -66,7 +64,6 @@ const Quizzess = () => {
             </Link>
           </div>
 
-          {/* Quiz List */}
           <div className="space-y-6">
             {quizzes.map((q) => (
               <div

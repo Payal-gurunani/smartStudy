@@ -8,21 +8,19 @@ import { FlashcardReview } from "../models/flashcardReview.model.js";
 export const getUserProgress = asyncHandler(async (req, res) => {
   const userId = req.user._id;
 
-  // 1. Quiz Results
+  
   const quizResults = await QuizResult.find({ user: userId });
   const totalQuizzes = quizResults.length;
   const totalScore = quizResults.reduce((sum, q) => sum + (q.score || 0), 0);
   const maxScore = quizResults.reduce((sum, q) => sum + (q.questions?.length || 0), 0);
   const avgScore = maxScore > 0 ? (totalScore / totalQuizzes) : 0;
 
-
-  // 2. Study Reminders
   const reminders = await StudySchedule.find({ user: userId });
   const totalReminders = reminders.length;
   const completed = reminders.filter(r => r.status === "completed").length;
   const skipped = reminders.filter(r => r.status === "skipped").length;
 
-  // 3. Flashcard Reviews
+  
   const flashcardReviews = await FlashcardReview.find({ user: userId });
   const totalFlashcardReviews = flashcardReviews.length;
 
@@ -56,4 +54,3 @@ export const logFlashcardReview = asyncHandler(async (req, res) => {
 
   res.status(201).json(new ApiResponse(201, review, "Flashcard review logged"));
 });
-
