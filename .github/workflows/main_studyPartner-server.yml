@@ -29,4 +29,4 @@ jobs:
         with:
           app-name: studyPartner-server
           publish-profile: ${{ secrets.AZURE_SERVER_PUBLISH_PROFILE }}
-          package: .
+          package: ./server
