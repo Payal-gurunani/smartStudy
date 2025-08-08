@@ -1,4 +1,5 @@
 import express from 'express';
+import dotenv from 'dotenv';
 import cookieParser from 'cookie-parser';
 import userRoutes from './routes/user.routes.js';
 import noteRoutes from './routes/note.routes.js';
@@ -10,7 +11,7 @@ import cors from 'cors';
 const app = express();
 app.use(
   cors({
-    origin: 'http://localhost:3005', 
+    origin: process.env.CLIENT_URL, 
     credentials: true,  
   })
 )
