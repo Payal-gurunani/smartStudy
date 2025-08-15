@@ -1,6 +1,5 @@
 import { asyncHandler } from "../utils/asyncHandler.js";
 import { ApiResponse } from "../utils/ApiResponse.js";
-import { ApiError } from "../utils/ApiError.js";
 import { QuizResult } from "../models/quizResult.model.js";  
 import { StudySchedule } from "../models/studySchedule.model.js";
 import { FlashcardReview } from "../models/flashcardReview.model.js";

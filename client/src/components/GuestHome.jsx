@@ -10,7 +10,7 @@ export default function GuestHome() {
         transition={{ duration: 0.5 }}
         className="space-y-6 max-w-xl"
       >
-        <h1 className="text-4xl font-bold tracking-tight">SmartStudy Assistant</h1>
+        <h1 className="text-4xl font-bold tracking-tight">Study Partner</h1>
         <p className="text-slate-300 text-sm">
           Prepare smarter, not harder. Create notes, generate flashcards, and take quizzes — all powered by AI.
         </p>

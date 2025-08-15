@@ -27,7 +27,17 @@ const Quizzess = () => {
     })();
   }, []);
 
-  if (loading) return <p className="text-center text-white mt-10">Loading quizzes...</p>;
+  if (loading) {
+  return (
+    <div className="flex min-h-screen bg-gray-900 text-white">
+      <Sidebar isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+      <main className="flex-1 sm:ml-60 px-4 py-6 sm:px-8 sm:py-10 w-full flex items-center justify-center">
+        <p>Loading quizzes...</p>
+      </main>
+    </div>
+  );
+}
+
   if (quizzes.length === 0)
     {
       return ( 

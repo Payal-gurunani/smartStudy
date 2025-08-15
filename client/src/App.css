@@ -1,6 +1,8 @@
-/* #root {
+#root {
+  background-color: black;
+  color: white;
   max-width: 1260px;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
-} */
+}

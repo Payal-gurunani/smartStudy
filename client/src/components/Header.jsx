@@ -14,12 +14,12 @@ const Header = () => {
   return (
     <header className="bg-[#0f1b32] text-white px-6 py-4 shadow-md sticky top-0 z-50 ">
       <div className="max-w-7xl mx-auto flex justify-between items-center">
-        {/* Logo */}
+        
         <Link to="/" className="text-2xl font-bold tracking-wide hover:text-orange-200 transition">
-          🎓 SmartStudy
+          🎓 Study Partner
         </Link>
 
-        {/* Navigation */}
+       
         <nav className="flex items-center gap-6 text-sm sm:text-base font-medium">
           {!isAuthenticated ? (
             <>
